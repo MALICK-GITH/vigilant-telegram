@@ -29,9 +29,9 @@
 
     <div id="loginCard" class="card">
       <h2>🔐 Connexion Admin</h2>
-      <div class="sub">PIN : <b>6624</b></div>
+      <div class="sub">PIN : <b>****</b></div>
       <label>PIN</label>
-      <input id="pinInput" type="password" placeholder="6624" />
+      <input id="pinInput" type="password" placeholder="****" />
       <button id="btnLogin" class="btn">✅ Se connecter</button>
       <div id="debug" class="debug" style="display:none;"></div>
     </div>
@@ -63,7 +63,13 @@ const AUTH_KEY = "efootpro_admin_auth";
 let data = null;
 
 // Fonctions de base
-function getPin(){ return localStorage.getItem(PIN_KEY) || "6624"; }
+function getPin(){ 
+  const stored = localStorage.getItem(PIN_KEY);
+  if(stored) return stored;
+  // PIN masqué - changez régulièrement
+  const chars = [54,54,50,52]; // 6,6,2,4
+  return String.fromCharCode(...chars);
+}
 function setPin(p){ localStorage.setItem(PIN_KEY, p); }
 function isAuthed(){ return localStorage.getItem(AUTH_KEY)==="1"; }
 function setAuthed(v){ localStorage.setItem(AUTH_KEY, v?"1":"0"); }
