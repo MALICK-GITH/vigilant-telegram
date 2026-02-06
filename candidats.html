@@ -1,44 +1,9 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LES ÉLITES EFOOTPRO — Candidats</title>
-  <style>
-    body{margin:0;background:#070A0F;color:#EAF0FF;font-family:system-ui,Arial}
-    .wrap{max-width:900px;margin:auto;padding:22px}
-    .card{border:1px solid #1C2742;border-radius:18px;background:#0E1422;padding:18px;margin-top:14px}
-    h1,h2{margin:0}
-    .sub{color:#A9B4D0;margin-top:6px;font-size:13px}
-    a{color:#9CCBFF;text-decoration:none}
-    .item{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid rgba(28,39,66,.65)}
-    .item:last-child{border-bottom:none}
-    .tag{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
-    .ok{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
-    .ko{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
-    .wait{border-color:rgba(255,176,32,.35);background:rgba(255,176,32,.10)}
-    footer{margin:18px 0 6px;text-align:center;color:#A9B4D0;font-size:12px}
-  </style>
-</head>
-<body>
-<div class="wrap">
-  <div class="card">
-    <h1>Candidats — LES ÉLITES EFOOTPRO</h1>
-    <div class="sub"><a href="index.html">← Accueil</a></div>
-    <div class="sub">Statuts : 🟢 Qualifié · 🔴 Éliminé · 🟠 En attente</div>
-  </div>
-
-  <div id="list"></div>
-
-  <footer>Signé SOLITAIRE HACK 🇨🇮</footer>
-</div>
-
 <script>
 (async function(){
   const box = document.getElementById("list");
 
   let res;
-  try { res = await fetch("/data.json", { cache: "no-store" }); }
+  try { res = await fetch("/data.json?ts=" + Date.now(), { cache: "no-store" }); }
   catch(e){ box.innerHTML = `<div class="card"><b>Erreur réseau :</b> impossible de charger data.json</div>`; return; }
 
   if(!res.ok){
@@ -47,10 +12,23 @@
   }
 
   const data = await res.json();
-  if(!data.players || data.players.length === 0){
+  const players = data.players || [];
+  const matches = data.matches || [];
+
+  if(players.length === 0){
     box.innerHTML = `<div class="card">Aucun joueur trouvé.</div>`;
     return;
   }
+
+  // ✅ Map: playerId -> dernière preuve trouvée (dans un match terminé)
+  const lastProofByPlayer = {};
+  matches
+    .filter(m => m.status === "TERMINE" && m.proofUrl)
+    .forEach(m => {
+      // On attribue la même preuve aux 2 joueurs du match
+      lastProofByPlayer[m.aId] = m.proofUrl;
+      lastProofByPlayer[m.bId] = m.proofUrl;
+    });
 
   function tagFor(status){
     if(status === "QUALIFIE") return `<span class="tag ok">🟢 QUALIFIÉ</span>`;
@@ -59,7 +37,26 @@
   }
 
   box.innerHTML = "";
-  data.players.forEach((p, idx) => {
+
+  players.forEach((p, idx) => {
+    const proof = lastProofByPlayer[p.id];
+
+    const proofMini = proof
+      ? `
+        <div style="margin-top:10px;">
+          <div class="sub">📸 Dernière preuve</div>
+          <a href="${proof}" target="_blank" rel="noopener">
+            <img
+              src="${proof}"
+              alt="Preuve du joueur"
+              style="width:100%;max-width:420px;border-radius:14px;border:1px solid #1C2742;display:block;margin-top:6px;"
+              loading="lazy"
+            />
+          </a>
+        </div>
+      `
+      : `<div class="sub" style="margin-top:10px;">📸 Preuve : aucune</div>`;
+
     const div = document.createElement("div");
     div.className = "card";
     div.innerHTML = `
@@ -67,10 +64,9 @@
         <div><b>${String(idx+1).padStart(2,"0")}.</b> ${p.name}</div>
         ${tagFor(p.status)}
       </div>
+      ${proofMini}
     `;
     box.appendChild(div);
   });
 })();
 </script>
-</body>
-</html>
