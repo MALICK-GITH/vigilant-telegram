@@ -41,7 +41,17 @@
       <div id="dashboard"></div>
       
       <div class="card" style="margin-top:20px;">
-        <h3>📤 Exporter</h3>
+        <h3>� Gestion des joueurs</h3>
+        <div id="playersList"></div>
+      </div>
+      
+      <div class="card" style="margin-top:20px;">
+        <h3>⚽ Gestion des matchs</h3>
+        <div id="matchesList"></div>
+      </div>
+      
+      <div class="card" style="margin-top:20px;">
+        <h3>�📤 Exporter</h3>
         <button id="btnExport" class="btn">📤 Télécharger JSON</button>
         <button id="btnPdf" class="btn">📄 Télécharger PDF</button>
       </div>
@@ -145,6 +155,95 @@ function renderDashboard(){
       </div>
     </div>
   `;
+  
+  renderPlayers();
+  renderMatches();
+}
+
+function renderPlayers(){
+  const players = data.players || [];
+  const html = players.map(p => `
+    <div class="card" style="margin:8px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <b>${p.name}</b>
+          <span class="tag ${p.status === 'QUALIFIE' ? 'q' : p.status === 'ELIMINE' ? 'e' : 'a'}">
+            ${p.status === 'QUALIFIE' ? '🟢 QUALIFIÉ' : p.status === 'ELIMINE' ? '🔴 ÉLIMINÉ' : '🟠 EN ATTENTE'}
+          </span>
+        </div>
+        <select onchange="updatePlayerStatus('${p.id}', this.value)" style="padding:4px;">
+          <option value="QUALIFIE" ${p.status === 'QUALIFIE' ? 'selected' : ''}>🟢 Qualifié</option>
+          <option value="ELIMINE" ${p.status === 'ELIMINE' ? 'selected' : ''}>🔴 Éliminé</option>
+          <option value="EN_ATTENTE" ${p.status === 'EN_ATTENTE' ? 'selected' : ''}>🟠 En attente</option>
+        </select>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById("playersList").innerHTML = html;
+}
+
+function renderMatches(){
+  const matches = data.matches || [];
+  const html = matches.map(m => {
+    const playerA = data.players?.find(p => p.id === m.aId);
+    const playerB = data.players?.find(p => p.id === m.bId);
+    const nameA = playerA?.name || m.aId;
+    const nameB = playerB?.name || m.bId;
+    
+    return `
+      <div class="card" style="margin:8px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <b>${m.id}</b>: ${nameA} vs ${nameB}
+            <span class="tag ${m.status === 'TERMINE' ? 'q' : 'a'}">
+              ${m.status === 'TERMINE' ? '✅ Terminé' : '⏳ À jouer'}
+            </span>
+            ${m.status === 'TERMINE' ? `<span style="margin-left:8px;">Score: <b>${m.scoreA}-${m.scoreB}</b></span>` : ''}
+          </div>
+          ${m.status !== 'TERMINE' ? `
+            <button onclick="validateMatch('${m.id}')" class="btn success" style="padding:4px 8px;">✅ Valider</button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById("matchesList").innerHTML = html;
+}
+
+function updatePlayerStatus(playerId, newStatus){
+  const player = data.players?.find(p => p.id === playerId);
+  if(player){
+    player.status = newStatus;
+    saveData(data);
+    renderDashboard();
+    debug(`✅ Statut de ${player.name} mis à jour`);
+  }
+}
+
+function validateMatch(matchId){
+  const scoreA = prompt("Score joueur A:");
+  const scoreB = prompt("Score joueur B:");
+  
+  if(scoreA === null || scoreB === null) return;
+  
+  const match = data.matches?.find(m => m.id === matchId);
+  if(match){
+    match.scoreA = parseInt(scoreA);
+    match.scoreB = parseInt(scoreB);
+    match.status = "TERMINE";
+    match.winnerId = match.scoreA > match.scoreB ? match.aId : match.bId;
+    
+    // Mettre à jour le statut des joueurs
+    const winner = data.players?.find(p => p.id === match.winnerId);
+    const loser = data.players?.find(p => p.id === (match.winnerId === match.aId ? match.bId : match.aId));
+    
+    if(winner) winner.status = "QUALIFIE";
+    if(loser) loser.status = "ELIMINE";
+    
+    saveData(data);
+    renderDashboard();
+    debug(`✅ Match ${matchId} validé`);
+  }
 }
 
 function download(filename, text){
