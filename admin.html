@@ -827,7 +827,14 @@
     btnLogin.addEventListener("click", async ()=>{
       clearDebug();
       const pin = (pinInput.value||"").trim();
-      if(pin !== getPin()){ debug("❌ Mauvais PIN."); return; }
+      const expectedPin = getPin();
+      
+      debug(`PIN entré: "${pin}" | PIN attendu: "${expectedPin}"`);
+      
+      if(pin !== expectedPin){ 
+        debug("❌ Mauvais PIN. Vérifiez : " + pin + " vs " + expectedPin); 
+        return; 
+      }
 
       setAuthed(true);
       btnLogout.classList.remove("hide");
