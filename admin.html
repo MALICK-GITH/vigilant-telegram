@@ -263,8 +263,8 @@
     function getPin(){ 
       const stored = localStorage.getItem(PIN_KEY);
       if(stored) return stored;
-      // PIN par défaut (un peu masqué)
-      return String.fromCharCode(54,54,50,52); // "6624"
+      // PIN par défaut (plus simple)
+      return "6624";
     }
     function setPin(p){ localStorage.setItem(PIN_KEY, p); }
     function isAuthed(){ return localStorage.getItem(AUTH_KEY)==="1"; }
@@ -827,12 +827,11 @@
     btnLogin.addEventListener("click", async ()=>{
       clearDebug();
       const pin = (pinInput.value||"").trim();
-      const expectedPin = getPin();
       
-      debug(`PIN entré: "${pin}" | PIN attendu: "${expectedPin}"`);
+      debug(`Test connexion avec PIN: "${pin}"`);
       
-      if(pin !== expectedPin){ 
-        debug("❌ Mauvais PIN. Vérifiez : " + pin + " vs " + expectedPin); 
+      if(pin !== "6624"){ 
+        debug("❌ Mauvais PIN. Le PIN correct est 6624"); 
         return; 
       }
 
@@ -847,9 +846,9 @@
         fillRoundFilter();
         renderAll();
         showTab("dash");
-        debug("✅ Connecté. Data chargée.");
+        debug("✅ Connecté avec succès !");
       }catch(e){
-        debug("❌ " + String(e.message||e));
+        debug("❌ Erreur: " + String(e.message||e));
       }
     });
 
