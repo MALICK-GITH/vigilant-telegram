@@ -1,0 +1,6 @@
+# Fichiers à ne pas publier
+config.js
+.env
+*.log
+.DS_Store
+node_modules/

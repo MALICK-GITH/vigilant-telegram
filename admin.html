@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — LES ÉLITES EFOOTPRO</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root{
       --bg:#070A0F; --card:#0E1422; --txt:#EAF0FF; --muted:#A9B4D0; --line:#1C2742;
@@ -88,15 +89,17 @@
 
     <div id="loginCard" class="card">
       <h2>Connexion Admin</h2>
-      <div class="sub">PIN par défaut : <b>6624</b></div>
+      <div class="sub">PIN par défaut : <b>****</b></div>
       <label>Entrer le PIN</label>
-      <input id="pinInput" type="password" inputmode="numeric" placeholder="6624" />
+      <input id="pinInput" type="password" inputmode="numeric" placeholder="••••" />
       <div class="row" style="margin-top:12px">
         <button id="btnLogin" class="btn">✅ Se connecter</button>
         <button id="btnLogout" class="btn ghost hide">🚪 Se déconnecter</button>
       </div>
       <div class="sub" style="margin-top:10px">
-        ⚠️ Site statique : tout est enregistré sur <b>ton téléphone</b> (localStorage). Pour publier à tous : <b>Export JSON</b> puis remplace <b>data.json</b> sur le dépôt.
+        ⚠️ <b>IMPORTANT</b> : Les modifications sont locales (votre navigateur).<br>
+        📤 <b>Pour sauvegarder</b> : Export JSON → Copiez dans data.json → Push sur GitHub.<br>
+        🔄 Vercel mettra à jour le site automatiquement après le push.
       </div>
     </div>
 
@@ -156,18 +159,31 @@
         <div class="row2">
           <div class="card" style="flex:1">
             <h2>📤 Export JSON</h2>
-            <div class="sub">Télécharge les données actuelles.</div>
+            <div class="sub">Télécharge les données actuelles <b>après modifications</b>.</div>
             <div class="row" style="margin-top:10px">
               <button id="btnExport" class="btn">📤 Télécharger</button>
             </div>
+            <div class="sub" style="margin-top:8px; color:var(--amber);">
+              💡 <b>Étapes suivantes</b> :<br>
+              1. Ouvrez le fichier téléchargé<br>
+              2. Copiez tout le contenu<br>
+              3. Remplacez data.json sur GitHub<br>
+              4. Push → Vercel met à jour automatiquement
+            </div>
           </div>
           <div class="card" style="flex:1">
-            <h2>📥 Import JSON</h2>
-            <div class="sub">Remplace localStorage par un fichier JSON.</div>
-            <label>Fichier .json</label>
-            <input id="importFile" type="file" accept="application/json" />
-            <div class="row" style="margin-top:10px">
-              <button id="btnImport" class="btn">📥 Importer</button>
+            <h2>� Export PDF</h2>
+            <div class="sub">Générez des rapports PDF du tournoi.</div>
+            <div class="row" style="margin-top:10px; gap:8px;">
+              <button id="btnPdfTournament" class="btn">🏆 Tournoi complet</button>
+              <button id="btnPdfCurrentRound" class="btn">⚽ Round actuel</button>
+            </div>
+            <div class="sub" style="margin-top:8px; color:var(--green);">
+              📋 <b>Contenu PDF</b> :<br>
+              • Liste des joueurs avec statuts<br>
+              • Matchs et résultats<br>
+              • Score et preuves<br>
+              • Format professionnel
             </div>
           </div>
         </div>
@@ -226,6 +242,8 @@
     const btnChangePin = document.getElementById("btnChangePin");
     const btnGenerateNext = document.getElementById("btnGenerateNext");
     const generateStatus = document.getElementById("generateStatus");
+    const btnPdfTournament = document.getElementById("btnPdfTournament");
+    const btnPdfCurrentRound = document.getElementById("btnPdfCurrentRound");
 
     let data = null;
 
@@ -242,7 +260,12 @@
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
         .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
-    function getPin(){ return localStorage.getItem(PIN_KEY) || "6624"; }
+    function getPin(){ 
+      const stored = localStorage.getItem(PIN_KEY);
+      if(stored) return stored;
+      // PIN par défaut (un peu masqué)
+      return String.fromCharCode(54,54,50,52); // "6624"
+    }
     function setPin(p){ localStorage.setItem(PIN_KEY, p); }
     function isAuthed(){ return localStorage.getItem(AUTH_KEY)==="1"; }
     function setAuthed(v){ localStorage.setItem(AUTH_KEY, v?"1":"0"); }
@@ -296,6 +319,16 @@
       const t = ms.filter(m=>m.status==="TERMINE").length;
       const aj = ms.filter(m=>m.status!=="TERMINE").length;
       return {t,aj,total:ms.length};
+    }
+    function currentRound(data){
+      // round actuel = premier round qui a au moins un match A_JOUER
+      const order = ["R32","R16","QF","SF","F"];
+      for(const r of order){
+        const ms = (data.matches||[]).filter(m=>m.round===r);
+        if(ms.length && ms.some(m=>m.status!=="TERMINE")) return r;
+      }
+      // sinon dernier
+      return "F";
     }
 
     function showTab(name){
@@ -647,6 +680,146 @@
     });
 
     btnGenerateNext.addEventListener("click", generateNextRoundFromCurrent);
+
+    // Fonctions PDF
+    function generatePdf(content, filename) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      doc.setFontSize(20);
+      doc.text("LES ÉLITES EFOOTPRO", 105, 20, { align: 'center' });
+      doc.setFontSize(12);
+      doc.text("Rapport de Tournoi", 105, 30, { align: 'center' });
+      
+      let yPosition = 50;
+      doc.setFontSize(10);
+      
+      content.forEach(line => {
+        if (line.startsWith('###')) {
+          doc.setFontSize(14);
+          doc.text(line.substring(3), 20, yPosition);
+          yPosition += 10;
+        } else if (line.startsWith('**')) {
+          doc.setFontSize(12);
+          doc.text(line.substring(2), 25, yPosition);
+          yPosition += 8;
+        } else {
+          doc.setFontSize(10);
+          const lines = doc.splitTextToSize(line, 170);
+          lines.forEach(textLine => {
+            doc.text(textLine, 20, yPosition);
+            yPosition += 6;
+          });
+        }
+        
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      });
+      
+      doc.save(filename);
+    }
+
+    function generateTournamentPdf() {
+      if (!data) {
+        debug("❌ Aucune donnée disponible pour générer le PDF");
+        return;
+      }
+      
+      const content = [];
+      content.push("### RAPPORT COMPLET DU TOURNOI");
+      content.push(`Généré le : ${new Date().toLocaleString('fr-FR')}`);
+      content.push("");
+      
+      // Statistiques
+      const pc = countPlayers(data);
+      const mc = countMatches(data);
+      content.push("### STATISTIQUES");
+      content.push(`**Total joueurs : ${pc.total}`);
+      content.push(`**Qualifiés : ${pc.q}`);
+      content.push(`**Éliminés : ${pc.e}`);
+      content.push(`**En attente : ${pc.a}`);
+      content.push(`**Total matchs : ${mc.total}`);
+      content.push(`**Terminés : ${mc.t}`);
+      content.push(`**À jouer : ${mc.aj}`);
+      content.push("");
+      
+      // Liste des joueurs
+      content.push("### LISTE DES JOUEURS");
+      (data.players || []).forEach((p, idx) => {
+        const status = p.status === "QUALIFIE" ? "🟢 QUALIFIÉ" : 
+                     p.status === "ELIMINE" ? "🔴 ÉLIMINÉ" : "🟠 EN ATTENTE";
+        content.push(`${String(idx + 1).padStart(2, '0')}. ${p.name} - ${status}`);
+      });
+      content.push("");
+      
+      // Matchs par round
+      const rounds = ["R32", "R16", "QF", "SF", "F"];
+      rounds.forEach(round => {
+        const roundMatches = (data.matches || []).filter(m => m.round === round);
+        if (roundMatches.length > 0) {
+          content.push(`### MATCHS ${round}`);
+          roundMatches.forEach(m => {
+            const a = getPlayerById(m.aId)?.name || m.aId;
+            const b = getPlayerById(m.bId)?.name || m.bId;
+            const score = m.status === "TERMINE" ? `${m.scoreA}-${m.scoreB}` : "À jouer";
+            const status = m.status === "TERMINE" ? "✅" : "⏳";
+            content.push(`${status} ${m.id} : ${a} vs ${b} [${score}]`);
+            if (m.proofUrl) {
+              content.push(`   Preuve : ${m.proofUrl}`);
+            }
+          });
+          content.push("");
+        }
+      });
+      
+      generatePdf(content, `tournoi-complet-${Date.now()}.pdf`);
+      debug("✅ PDF du tournoi complet généré");
+    }
+
+    function generateCurrentRoundPdf() {
+      if (!data) {
+        debug("❌ Aucune donnée disponible pour générer le PDF");
+        return;
+      }
+      
+      const currentRound = currentRound(data);
+      const roundMatches = (data.matches || []).filter(m => m.round === currentRound);
+      
+      const content = [];
+      content.push(`### RAPPORT ROUND ${currentRound}`);
+      content.push(`Généré le : ${new Date().toLocaleString('fr-FR')}`);
+      content.push("");
+      
+      if (roundMatches.length === 0) {
+        content.push("Aucun match trouvé pour ce round.");
+      } else {
+        content.push(`### ${roundMatches.length} MATCH(S) EN COURS`);
+        roundMatches.forEach(m => {
+          const a = getPlayerById(m.aId)?.name || m.aId;
+          const b = getPlayerById(m.bId)?.name || m.bId;
+          const score = m.status === "TERMINE" ? `${m.scoreA}-${m.scoreB}` : "À jouer";
+          const status = m.status === "TERMINE" ? "✅ TERMINÉ" : "⏳ À JOUER";
+          content.push(`${status} ${m.id} : ${a} vs ${b} [${score}]`);
+          
+          if (m.status === "TERMINE") {
+            const winner = getPlayerById(m.winnerId)?.name || m.winnerId;
+            content.push(`   🏆 Vainqueur : ${winner}`);
+            if (m.proofUrl) {
+              content.push(`   📸 Preuve : ${m.proofUrl}`);
+            }
+          }
+          content.push("");
+        });
+      }
+      
+      generatePdf(content, `round-${currentRound}-${Date.now()}.pdf`);
+      debug(`✅ PDF du round ${currentRound} généré`);
+    }
+
+    btnPdfTournament.addEventListener("click", generateTournamentPdf);
+    btnPdfCurrentRound.addEventListener("click", generateCurrentRoundPdf);
 
     playerSearch.addEventListener("input", renderPlayers);
     roundFilter.addEventListener("change", renderMatches);
