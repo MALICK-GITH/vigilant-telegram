@@ -2,31 +2,65 @@
   "players": [
     { "id": "p1", "name": "SOLITAIRE HACKci", "status": "ELIMINE" },
     { "id": "p2", "name": "le proverbe africain", "status": "QUALIFIE" },
+    { "id": "p3", "name": "Charme Boy", "status": "EN_ATTENTE" },
+    { "id": "p4", "name": "BEN BLOOM", "status": "EN_ATTENTE" },
     { "id": "p5", "name": "Deku", "status": "QUALIFIE" },
-    { "id": "p11", "name": "+225 0152553426", "status": "ELIMINE" }
+    { "id": "p6", "name": "~ Moilime 😎💗", "status": "EN_ATTENTE" },
+    { "id": "p7", "name": "~ EL Hassan Fofana", "status": "EN_ATTENTE" },
+    { "id": "p8", "name": "~ Ålâdjî EB~13", "status": "EN_ATTENTE" },
+    { "id": "p9", "name": "~ Mr Coulibaly 😎", "status": "EN_ATTENTE" },
+
+    { "id": "p10", "name": "+225 0151468346", "status": "EN_ATTENTE" },
+    { "id": "p11", "name": "+225 0152553426", "status": "ELIMINE" },
+    { "id": "p12", "name": "+225 0161135102", "status": "EN_ATTENTE" },
+    { "id": "p13", "name": "+225 0170751387", "status": "EN_ATTENTE" },
+    { "id": "p14", "name": "+225 0170892643", "status": "EN_ATTENTE" },
+    { "id": "p15", "name": "+225 0172189176", "status": "EN_ATTENTE" },
+    { "id": "p16", "name": "+225 0172200813", "status": "EN_ATTENTE" },
+
+    { "id": "p17", "name": "+225 0501154431", "status": "EN_ATTENTE" },
+    { "id": "p18", "name": "+225 0507607690", "status": "EN_ATTENTE" },
+    { "id": "p19", "name": "+225 0544008930", "status": "EN_ATTENTE" },
+    { "id": "p20", "name": "+225 0554658075", "status": "EN_ATTENTE" },
+    { "id": "p21", "name": "+225 0565931689", "status": "EN_ATTENTE" },
+    { "id": "p22", "name": "+225 0594301045", "status": "EN_ATTENTE" },
+    { "id": "p23", "name": "+225 0596203053", "status": "EN_ATTENTE" },
+    { "id": "p24", "name": "+225 0715079633", "status": "EN_ATTENTE" },
+
+    { "id": "p25", "name": "+225 0717910982", "status": "EN_ATTENTE" },
+    { "id": "p26", "name": "+225 0789196655", "status": "EN_ATTENTE" },
+    { "id": "p27", "name": "+225 0789294004", "status": "EN_ATTENTE" },
+    { "id": "p28", "name": "+225 0797378566", "status": "EN_ATTENTE" },
+    { "id": "p29", "name": "+225 0797692995", "status": "EN_ATTENTE" },
+    { "id": "p30", "name": "+226 56 47 21 02", "status": "EN_ATTENTE" },
+    { "id": "p31", "name": "+229 65 87 26 50", "status": "EN_ATTENTE" },
+    { "id": "p32", "name": "+237 6 72 31 05 92", "status": "EN_ATTENTE" }
   ],
+
   "matches": [
     {
       "id": "m01",
       "round": "R32",
-      "a": "Deku",
-      "b": "+225 0152553426",
+      "aId": "p5",
+      "bId": "p11",
       "scoreA": 5,
       "scoreB": 3,
-      "winner": "Deku",
-      "loser": "+225 0152553426",
-      "status": "TERMINE"
+      "winnerId": "p5",
+      "loserId": "p11",
+      "status": "TERMINE",
+      "proofUrl": "https://instasize.com/p/34f4b885eea0a0d7fa7ed9d9f0e1317fd2f19cadea09639d4ccfd0bd9c31f7a6"
     },
     {
       "id": "m02",
       "round": "R32",
-      "a": "le proverbe africain",
-      "b": "SOLITAIRE HACKci",
+      "aId": "p2",
+      "bId": "p1",
       "scoreA": 5,
       "scoreB": 2,
-      "winner": "le proverbe africain",
-      "loser": "SOLITAIRE HACKci",
-      "status": "TERMINE"
+      "winnerId": "p2",
+      "loserId": "p1",
+      "status": "TERMINE",
+      "proofUrl": "https://instasize.com/p/d4208db5f377c03ce1853288b22dba9d0c450346b4c4001f3a11c4efc5f506af"
     }
   ]
 }
