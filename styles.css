@@ -1,0 +1,86 @@
+:root{
+  --bg:#070A0F;
+  --card:#0E1422;
+  --txt:#EAF0FF;
+  --muted:#A9B4D0;
+  --line:#1C2742;
+  --green:#25D366;
+  --neon:#00E5FF;
+  --amber:#FFB020;
+  --red:#FF4D4D;
+  --shadow: 0 12px 40px rgba(0,0,0,.45);
+  --radius: 18px;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(0,229,255,.10), transparent 60%),
+    radial-gradient(900px 500px at 90% 20%, rgba(37,211,102,.10), transparent 55%),
+    radial-gradient(900px 500px at 50% 90%, rgba(255,176,32,.08), transparent 55%),
+    var(--bg);
+  color:var(--txt);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  line-height:1.35;
+  font-size:16px;
+}
+
+a{color:#CFE7FF;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.wrap{max-width:980px;margin:0 auto;padding:22px}
+
+.card{
+  margin-top:16px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:linear-gradient(180deg, rgba(14,20,34,.90), rgba(11,16,32,.90));
+  box-shadow:var(--shadow);
+  padding:18px;
+}
+
+h1,h2{margin:0 0 10px}
+h1{font-size:20px;letter-spacing:.5px}
+h2{font-size:16px;letter-spacing:.3px}
+.sub{color:var(--muted);font-size:13px}
+.kicker{color:var(--muted);font-size:11px;letter-spacing:.9px;text-transform:uppercase}
+.big{font-size:18px;font-weight:900}
+.green{color:var(--green)}
+
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px 14px;border-radius:16px;border:1px solid rgba(28,39,66,.9);
+  background:rgba(255,255,255,.02);
+  color:var(--txt);
+  cursor:pointer;
+  font-weight:800;
+}
+.btn:hover{border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.06)}
+.btn.ghost{background:transparent}
+
+.tag{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:999px;font-size:12px;font-weight:800;
+  border:1px solid rgba(28,39,66,.9);
+}
+.tag.q{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10);color:#D8FFE8}
+.tag.e{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10);color:#FFD6D6}
+.tag.a{border-color:rgba(255,176,32,.35);background:rgba(255,176,32,.10);color:#FFF0D0}
+
+.debug{
+  padding:12px 14px;border-radius:14px;
+  border:1px dashed rgba(0,229,255,.35);
+  background:rgba(0,229,255,.06);
+  color:#DDF9FF;
+  font-size:12px;
+  white-space:pre-wrap;
+}
+
+footer{
+  margin:22px 0 8px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+}
