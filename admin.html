@@ -88,9 +88,9 @@
 
     <div id="loginCard" class="card">
       <h2>Connexion Admin</h2>
-      <div class="sub">PIN par défaut : <b>6624</b></div>
+      <div class="sub">PIN par défaut : <b>****</b></div>
       <label>Entrer le PIN</label>
-      <input id="pinInput" type="password" inputmode="numeric" placeholder="6624" />
+      <input id="pinInput" type="password" inputmode="numeric" placeholder="••••" />
       <div class="row" style="margin-top:12px">
         <button id="btnLogin" class="btn">✅ Se connecter</button>
         <button id="btnLogout" class="btn ghost hide">🚪 Se déconnecter</button>
@@ -242,7 +242,12 @@
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
         .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
-    function getPin(){ return localStorage.getItem(PIN_KEY) || "6624"; }
+    function getPin(){ 
+      const stored = localStorage.getItem(PIN_KEY);
+      if(stored) return stored;
+      // PIN par défaut (un peu masqué)
+      return String.fromCharCode(54,54,50,52); // "6624"
+    }
     function setPin(p){ localStorage.setItem(PIN_KEY, p); }
     function isAuthed(){ return localStorage.getItem(AUTH_KEY)==="1"; }
     function setAuthed(v){ localStorage.setItem(AUTH_KEY, v?"1":"0"); }
