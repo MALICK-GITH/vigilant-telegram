@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — LES ÉLITES EFOOTPRO</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .tabbtn{cursor:pointer}
+    .tabbtn.active{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
+    .grid{display:grid;gap:12px}
+    .grid2{grid-template-columns:1fr; }
+    @media(min-width:900px){ .grid2{grid-template-columns:1fr 1fr;} }
+
+    input, select, textarea{
+      width:100%; padding:10px 12px; border-radius:12px;
+      border:1px solid rgba(28,39,66,.9); background:rgba(255,255,255,.02);
+      color:var(--txt); outline:none;
+    }
+    textarea{min-height:90px; resize:vertical}
+    label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px}
+    .small{font-size:12px;color:var(--muted)}
+    .hr{height:1px;background:rgba(28,39,66,.7);margin:14px 0}
+    .danger{border-color:rgba(255,77,77,.35)!important;background:rgba(255,77,77,.10)!important}
+    .success{border-color:rgba(37,211,102,.35)!important;background:rgba(37,211,102,.10)!important}
+    .list{display:grid;gap:12px}
+    .row2{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(28,39,66,.9);background:rgba(255,255,255,.02);font-size:12px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}
+    .imgPrev{margin-top:8px}
+    .imgPrev img{width:100%;max-width:520px;border-radius:14px;border:1px solid var(--line);display:block}
+    .hide{display:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>🔐 Admin — LES ÉLITES <span class="green">EFOOTPRO</span></h1>
+      <div class="sub"><a href="/index.html">← Accueil</a> · <a href="/matchs.html">Matchs</a> · <a href="/candidats.html">Candidats</a></div>
+      <div id="debug" class="debug" style="display:none;margin-top:10px"></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginCard" class="card">
+      <h2>Connexion Admin</h2>
+      <div class="sub">PIN par défaut : <b>0000</b> (tu pourras le changer ensuite).</div>
+
+      <label>Entrer le PIN</label>
+      <input id="pinInput" type="password" inputmode="numeric" placeholder="0000" />
+
+      <div class="row" style="margin-top:12px">
+        <button id="btnLogin" class="btn">✅ Se connecter</button>
+        <button id="btnLogout" class="btn ghost hide">🚪 Se déconnecter</button>
+      </div>
+
+      <div class="small" style="margin-top:10px">
+        ⚠️ Sur site statique, tout est enregistré sur <b>ton téléphone</b> (localStorage).  
+        Pour publier à tout le monde, utilise <b>Export</b> puis remplace <b>data.json</b> sur Vercel.
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div id="appCard" class="card hide">
+      <h2>Console Admin</h2>
+
+      <div class="tabs">
+        <button class="btn tabbtn active" data-tab="dash">📊 Dashboard</button>
+        <button class="btn tabbtn" data-tab="players">👥 Joueurs</button>
+        <button class="btn tabbtn" data-tab="matches">⚔️ Matchs</button>
+        <button class="btn tabbtn" data-tab="rounds">🧬 Tours</button>
+        <button class="btn tabbtn" data-tab="history">🧾 Historique</button>
+        <button class="btn tabbtn" data-tab="io">📤 Export / 📥 Import</button>
+        <button class="btn tabbtn" data-tab="settings">⚙️ Réglages</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <!-- DASH -->
+      <section id="tab-dash">
+        <div class="grid grid2">
+          <div class="card">
+            <h2>Résumé</h2>
+            <div id="dashSummary" class="sub">Chargement…</div>
+          </div>
+          <div class="card">
+            <h2>Round actuel</h2>
+            <div id="dashRound" class="sub">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLAYERS -->
+      <section id="tab-players" class="hide">
+        <h2>Joueurs</h2>
+        <div class="sub">Modifier un statut ou un nom. (Ne supprime jamais un joueur.)</div>
+
+        <label>Recherche (nom / numéro)</label>
+        <input id="playerSearch" placeholder="Ex: Deku ou +225…" />
+
+        <div class="list" id="playersList" style="margin-top:12px"></div>
+      </section>
+
+      <!-- MATCHES -->
+      <section id="tab-matches" class="hide">
+        <h2>Matchs</h2>
+        <div class="sub">Valide un match : score + preuve image (.jpg/.png/.webp). Égalité interdite.</div>
+
+        <div class="row2" style="margin-top:10px">
+          <div style="min-width:220px;flex:1">
+            <label>Filtrer par round</label>
+            <select id="roundFilter"></select>
+          </div>
+          <div style="min-width:220px;flex:1">
+            <label>Nom Admin (affiché dans l’historique)</label>
+            <input id="adminName" placeholder="Ex: SOLITAIRE HACK 🇨🇮" />
+          </div>
+        </div>
+
+        <div class="list" id="matchesList" style="margin-top:12px"></div>
+      </section>
+
+      <!-- ROUNDS -->
+      <section id="tab-rounds" class="hide">
+        <h2>Génération de tours</h2>
+        <div class="sub">
+          Génère le tour suivant automatiquement (R32→R16→QF→SF→F).
+          Condition : tous les matchs du tour précédent doivent être <b>TERMINE</b>.
+        </div>
+
+        <div class="row2" style="margin-top:12px">
+          <div style="min-width:220px;flex:1">
+            <label>Depuis</label>
+            <select id="fromRound"></select>
+          </div>
+          <div style="min-width:220px;flex:1">
+            <label>Vers</label>
+            <select id="toRound"></select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button id="btnGenRound" class="btn">🧬 Générer le tour suivant</button>
+        </div>
+
+        <div id="roundGenInfo" class="sub" style="margin-top:10px"></div>
+      </section>
+
+      <!-- HISTORY -->
+      <section id="tab-history" class="hide">
+        <h2>Historique</h2>
+        <div class="sub">Tout ce que tu valides ici est enregistré.</div>
+        <div class="list" id="historyList" style="margin-top:12px"></div>
+      </section>
+
+      <!-- IO -->
+      <section id="tab-io" class="hide">
+        <h2>Export / Import</h2>
+
+        <div class="grid grid2">
+          <div class="card">
+            <h2>📤 Export</h2>
+            <div class="sub">Télécharge le JSON actuel (celui de localStorage).</div>
+            <div class="row" style="margin-top:10px">
+              <button id="btnExport" class="btn">📤 Télécharger JSON</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>📥 Import</h2>
+            <div class="sub">Importer un JSON remplace les données de localStorage.</div>
+            <label>Choisir un fichier .json</label>
+            <input id="importFile" type="file" accept="application/json" />
+            <div class="row" style="margin-top:10px">
+              <button id="btnImport" class="btn">📥 Importer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>♻️ Reset</h2>
+          <div class="sub">Efface localStorage et revient au <b>data.json</b> officiel du site.</div>
+          <div class="row" style="margin-top:10px">
+            <button id="btnReset" class="btn danger">♻️ Réinitialiser</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="tab-settings" class="hide">
+        <h2>Réglages</h2>
+        <div class="sub">Change le PIN Admin.</div>
+
+        <label>Nouveau PIN</label>
+        <input id="newPin" type="password" inputmode="numeric" placeholder="Ex: 1234" />
+
+        <div class="row" style="margin-top:12px">
+          <button id="btnChangePin" class="btn">🔒 Changer PIN</button>
+        </div>
+
+        <div class="small" style="margin-top:10px">
+          PIN enregistré sur ton téléphone (localStorage). Si tu changes d’appareil, il faudra le remettre.
+        </div>
+      </section>
+    </div>
+
+    <footer>Signé SOLITAIRE HACK 🇨🇮</footer>
+  </div>
+
+  <script type="module">
+    import {
+      loadData, saveData, resetData,
+      getPlayerById, escapeHtml, statusTag,
+      roundsOrder, currentRound,
+      validateMatch, generateNextRound
+    } from "./app.js";
+
+    const PIN_KEY = "efootpro_admin_pin";
+    const AUTH_KEY = "efootpro_admin_auth";
+
+    const debugEl = document.getElementById("debug");
+    const loginCard = document.getElementById("loginCard");
+    const appCard = document.getElementById("appCard");
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
+    const pinInput = document.getElementById("pinInput");
+
+    const tabBtns = [...document.querySelectorAll(".tabbtn")];
+    const tabIds = ["dash","players","matches","rounds","history","io","settings"];
+
+    const dashSummary = document.getElementById("dashSummary");
+    const dashRound = document.getElementById("dashRound");
+
+    const playerSearch = document.getElementById("playerSearch");
+    const playersList = document.getElementById("playersList");
+
+    const roundFilter = document.getElementById("roundFilter");
+    const adminName = document.getElementById("adminName");
+    const matchesList = document.getElementById("matchesList");
+
+    const fromRound = document.getElementById("fromRound");
+    const toRound = document.getElementById("toRound");
+    const btnGenRound = document.getElementById("btnGenRound");
+    const roundGenInfo = document.getElementById("roundGenInfo");
+
+    const historyList = document.getElementById("historyList");
+
+    const btnExport = document.getElementById("btnExport");
+    const importFile = document.getElementById("importFile");
+    const btnImport = document.getElementById("btnImport");
+    const btnReset = document.getElementById("btnReset");
+
+    const newPin = document.getElementById("newPin");
+    const btnChangePin = document.getElementById("btnChangePin");
+
+    let data = null;
+
+    function debug(msg){
+      debugEl.style.display = "block";
+      debugEl.textContent = String(msg);
+    }
+    function clearDebug(){
+      debugEl.style.display = "none";
+      debugEl.textContent = "";
+    }
+
+    function getPin(){
+      return localStorage.getItem(PIN_KEY) || "0000";
+    }
+    function setPin(p){
+      localStorage.setItem(PIN_KEY, p);
+    }
+    function isAuthed(){
+      return localStorage.getItem(AUTH_KEY) === "1";
+    }
+    function setAuthed(v){
+      localStorage.setItem(AUTH_KEY, v ? "1" : "0");
+    }
+
+    function showTab(name){
+      tabIds.forEach(t=>{
+        document.getElementById("tab-"+t).classList.toggle("hide", t!==name);
+      });
+      tabBtns.forEach(b=>b.classList.toggle("active", b.dataset.tab===name));
+    }
+
+    function countPlayers(){
+      const ps = data.players || [];
+      const q = ps.filter(p=>p.status==="QUALIFIE").length;
+      const e = ps.filter(p=>p.status==="ELIMINE").length;
+      const a = ps.filter(p=>p.status!=="QUALIFIE" && p.status!=="ELIMINE").length;
+      return {q,e,a,total:ps.length};
+    }
+
+    function countMatches(){
+      const ms = data.matches || [];
+      const t = ms.filter(m=>m.status==="TERMINE").length;
+      const aj = ms.filter(m=>m.status!=="TERMINE").length;
+      return {t,aj,total:ms.length};
+    }
+
+    function ensureHistory(){
+      if(!data.history) data.history = [];
+    }
+
+    function renderDashboard(){
+      const pc = countPlayers();
+      const mc = countMatches();
+      const cur = currentRound(data);
+
+      dashSummary.innerHTML = `
+        <div class="row2">
+          <span class="pill">👥 Joueurs: <b>${pc.total}</b></span>
+          <span class="pill">🟢 Qualifiés: <b>${pc.q}</b></span>
+          <span class="pill">🔴 Éliminés: <b>${pc.e}</b></span>
+          <span class="pill">🟠 En attente: <b>${pc.a}</b></span>
+        </div>
+        <div class="row2" style="margin-top:10px">
+          <span class="pill">⚔️ Matchs: <b>${mc.total}</b></span>
+          <span class="pill">✅ Terminés: <b>${mc.t}</b></span>
+          <span class="pill">🕒 À jouer: <b>${mc.aj}</b></span>
+        </div>
+      `;
+      dashRound.innerHTML = `<div class="big">${cur}</div><div class="sub">Filtre Matchs disponible.</div>`;
+    }
+
+    function renderPlayers(){
+      const q = (playerSearch.value || "").toLowerCase().trim();
+      const ps = (data.players || [])
+        .map((p, idx)=>({p, idx}))
+        .filter(x => !q || x.p.name.toLowerCase().includes(q) || String(x.idx+1).padStart(2,"0").includes(q));
+
+      playersList.innerHTML = "";
+      ps.forEach(({p, idx})=>{
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="row">
+            <div>
+              <div class="kicker">JOUEUR #${String(idx+1).padStart(2,"0")}</div>
+              <div class="big">${escapeHtml(p.name)}</div>
+              <div class="sub mono">${escapeHtml(p.id)}</div>
+            </div>
+            ${statusTag(p.status)}
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row2">
+            <div style="flex:1;min-width:220px">
+              <label>Nom</label>
+              <input data-pid="${p.id}" data-field="name" value="${escapeHtml(p.name)}">
+            </div>
+            <div style="flex:1;min-width:220px">
+              <label>Statut</label>
+              <select data-pid="${p.id}" data-field="status">
+                <option value="EN_ATTENTE" ${p.status==="EN_ATTENTE"?"selected":""}>EN_ATTENTE</option>
+                <option value="QUALIFIE" ${p.status==="QUALIFIE"?"selected":""}>QUALIFIE</option>
+                <option value="ELIMINE" ${p.status==="ELIMINE"?"selected":""}>ELIMINE</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <button class="btn success" data-action="savePlayer" data-pid="${p.id}">💾 Sauvegarder</button>
+            <a class="btn ghost" href="/profil.html?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">👤 Ouvrir profil</a>
+          </div>
+        `;
+        playersList.appendChild(card);
+      });
+
+      // Actions
+      playersList.querySelectorAll("[data-action='savePlayer']").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const pid = btn.dataset.pid;
+          const nameEl = playersList.querySelector(`[data-pid='${pid}'][data-field='name']`);
+          const stEl   = playersList.querySelector(`[data-pid='${pid}'][data-field='status']`);
+          const p = (data.players||[]).find(x=>x.id===pid);
+          if(!p) return;
+          p.name = nameEl.value.trim() || p.name;
+          p.status = stEl.value;
+          ensureHistory();
+          data.history.unshift({ts:new Date().toISOString(), type:"PLAYER_UPDATE", message:`Joueur modifié: ${p.name} (${p.id}) -> ${p.status}`, actor: adminName.value||"Admin"});
+          saveData(data);
+          renderAll();
+        });
+      });
+    }
+
+    function fillRoundsSelect(sel){
+      sel.innerHTML = "";
+      roundsOrder().forEach(r=>{
+        const opt = document.createElement("option");
+        opt.value = r; opt.textContent = r;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderMatches(){
+      const rf = roundFilter.value;
+      const ms = (data.matches || []).filter(m=>m.round===rf);
+
+      matchesList.innerHTML = "";
+      if(ms.length === 0){
+        matchesList.innerHTML = `<div class="card">Aucun match dans ${rf}.</div>`;
+        return;
+      }
+
+      ms.forEach(m=>{
+        const a = getPlayerById(data, m.aId)?.name || m.aId;
+        const b = getPlayerById(data, m.bId)?.name || m.bId;
+        const done = m.status==="TERMINE";
+        const score = done ? `${m.scoreA}-${m.scoreB}` : "À jouer";
+
+        const proof = (done && m.proofUrl) ? `
+          <div class="imgPrev">
+            <div class="sub">📸 Preuve</div>
+            <a href="${m.proofUrl}" target="_blank" rel="noopener">
+              <img src="${m.proofUrl}" alt="preuve" loading="lazy">
+            </a>
+          </div>` : "";
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="row">
+            <div>
+              <div class="kicker">${escapeHtml(m.id)} · ${escapeHtml(m.round)}</div>
+              <div class="big">${escapeHtml(a)} <span class="mono">vs</span> ${escapeHtml(b)}</div>
+              <div class="sub">Statut: <b>${escapeHtml(m.status)}</b> · Score: <b>${escapeHtml(score)}</b></div>
+              ${done && m.validatedBy ? `<div class="sub">Validé par: <b>${escapeHtml(m.validatedBy)}</b>${m.playedAt?` · ${escapeHtml(m.playedAt)}`:""}</div>`:""}
+            </div>
+            <span class="pill mono">${escapeHtml(m.aId)} | ${escapeHtml(m.bId)}</span>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row2">
+            <div style="flex:1;min-width:160px">
+              <label>Score A</label>
+              <input type="number" min="0" step="1" value="${done?m.scoreA:""}" data-mid="${m.id}" data-field="scoreA" placeholder="Ex: 5">
+            </div>
+            <div style="flex:1;min-width:160px">
+              <label>Score B</label>
+              <input type="number" min="0" step="1" value="${done?m.scoreB:""}" data-mid="${m.id}" data-field="scoreB" placeholder="Ex: 2">
+            </div>
+            <div style="flex:2;min-width:240px">
+              <label>Preuve (URL image directe .jpg/.png/.webp)</label>
+              <input value="${m.proofUrl||""}" data-mid="${m.id}" data-field="proofUrl" placeholder="https://i.ibb.co/.../image.webp">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <button class="btn success" data-action="validate" data-mid="${m.id}">✅ Valider ce match</button>
+            <a class="btn ghost" href="/matchs.html" target="_blank" rel="noopener">🌐 Voir côté public</a>
+          </div>
+
+          ${proof}
+        `;
+        matchesList.appendChild(card);
+      });
+
+      matchesList.querySelectorAll("[data-action='validate']").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          clearDebug();
+          const mid = btn.dataset.mid;
+          const sA = matchesList.querySelector(`[data-mid='${mid}'][data-field='scoreA']`).value;
+          const sB = matchesList.querySelector(`[data-mid='${mid}'][data-field='scoreB']`).value;
+          const pU = matchesList.querySelector(`[data-mid='${mid}'][data-field='proofUrl']`).value.trim();
+          try{
+            const m = validateMatch(data, mid, sA, sB, pU, adminName.value || "Admin");
+            saveData(data);
+            renderAll();
+            debug(`✅ Match validé: ${m.id} (${m.scoreA}-${m.scoreB})`);
+          }catch(e){
+            debug("❌ " + String(e));
+          }
+        });
+      });
+    }
+
+    function renderHistory(){
+      ensureHistory();
+      const h = data.history.slice(0, 80);
+      historyList.innerHTML = "";
+      if(h.length === 0){
+        historyList.innerHTML = `<div class="card">Aucun historique.</div>`;
+        return;
+      }
+      h.forEach(item=>{
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="kicker">${escapeHtml(item.type || "LOG")}</div>
+          <div class="sub">${escapeHtml(item.ts || "")} · <b>${escapeHtml(item.actor || "Admin")}</b></div>
+          <div style="margin-top:8px">${escapeHtml(item.message || "")}</div>
+        `;
+        historyList.appendChild(card);
+      });
+    }
+
+    function renderRounds(){
+      const cur = currentRound(data);
+      const nextMap = { "R32":"R16", "R16":"QF", "QF":"SF", "SF":"F" };
+      fromRound.value = cur;
+      toRound.value = nextMap[cur] || "F";
+      roundGenInfo.textContent = `Round actuel détecté: ${cur}. Prochain suggéré: ${toRound.value}.`;
+    }
+
+    function renderAll(){
+      renderDashboard();
+      renderPlayers();
+      renderMatches();
+      renderRounds();
+      renderHistory();
+    }
+
+    function download(filename, text){
+      const blob = new Blob([text], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // Tabs
+    tabBtns.forEach(b=>{
+      b.addEventListener("click", ()=> showTab(b.dataset.tab));
+    });
+
+    // Search
+    playerSearch.addEventListener("input", ()=> renderPlayers());
+
+    // Round filter
+    roundFilter.addEventListener("change", ()=> renderMatches());
+
+    // Generate round
+    btnGenRound.addEventListener("click", ()=>{
+      clearDebug();
+      try{
+        const created = generateNextRound(data, fromRound.value, toRound.value, adminName.value||"Admin");
+        saveData(data);
+        renderAll();
+        debug(`✅ ${created.length} matchs créés pour ${toRound.value}.`);
+      }catch(e){
+        debug("❌ " + String(e));
+      }
+    });
+
+    // Export
+    btnExport.addEventListener("click", ()=>{
+      clearDebug();
+      const text = JSON.stringify(data, null, 2);
+      download("efootpro.export.json", text);
+      debug("✅ Export téléchargé.");
+    });
+
+    // Import
+    btnImport.addEventListener("click", async ()=>{
+      clearDebug();
+      const f = importFile.files?.[0];
+      if(!f){ debug("❌ Choisis un fichier JSON."); return; }
+      try{
+        const txt = await f.text();
+        const obj = JSON.parse(txt);
+        data = obj;
+        ensureHistory();
+        data.history.unshift({ts:new Date().toISOString(), type:"IMPORT", message:"Import JSON effectué.", actor: adminName.value||"Admin"});
+        saveData(data);
+        renderAll();
+        debug("✅ Import OK.");
+      }catch(e){
+        debug("❌ Import impossible: " + String(e));
+      }
+    });
+
+    // Reset
+    btnReset.addEventListener("click", async ()=>{
+      clearDebug();
+      resetData();
+      data = await loadData();
+      renderAll();
+      debug("♻️ Reset OK (retour au data.json officiel).");
+    });
+
+    // Change PIN
+    btnChangePin.addEventListener("click", ()=>{
+      clearDebug();
+      const p = (newPin.value||"").trim();
+      if(!/^\d{4,8}$/.test(p)){ debug("❌ PIN invalide. Mets 4 à 8 chiffres."); return; }
+      setPin(p);
+      newPin.value = "";
+      debug("✅ PIN changé.");
+    });
+
+    // Login/Logout
+    btnLogin.addEventListener("click", async ()=>{
+      clearDebug();
+      const pin = (pinInput.value||"").trim();
+      if(pin !== getPin()){
+        debug("❌ Mauvais PIN.");
+        return;
+      }
+      setAuthed(true);
+      btnLogout.classList.remove("hide");
+      loginCard.classList.add("hide");
+      appCard.classList.remove("hide");
+
+      try{
+        data = await loadData();
+        fillRoundsSelect(roundFilter);
+        fillRoundsSelect(fromRound);
+        fillRoundsSelect(toRound);
+
+        // Prefill admin name
+        if(!adminName.value) adminName.value = "SOLITAIRE HACK 🇨🇮";
+
+        // default round filter
+        roundFilter.value = currentRound(data);
+
+        renderAll();
+        showTab("dash");
+        debug("✅ Connecté.");
+      }catch(e){
+        debug("❌ " + String(e));
+      }
+    });
+
+    btnLogout.addEventListener("click", ()=>{
+      setAuthed(false);
+      appCard.classList.add("hide");
+      loginCard.classList.remove("hide");
+      btnLogout.classList.add("hide");
+      clearDebug();
+      pinInput.value = "";
+    });
+
+    // Auto-login if already authed
+    (async function init(){
+      try{
+        if(isAuthed()){
+          pinInput.value = getPin(); // auto (tu peux enlever si tu veux)
+          btnLogin.click();
+        }
+      }catch(e){
+        debug("❌ " + String(e));
+      }
+    })();
+  </script>
+</body>
+</html>
