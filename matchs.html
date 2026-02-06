@@ -10,22 +10,22 @@
     .card{border:1px solid #1C2742;border-radius:18px;background:#0E1422;padding:18px;margin-top:14px}
     h1,h2{margin:0}
     .sub{color:#A9B4D0;margin-top:6px;font-size:13px}
-    .match{margin-top:10px;padding:12px;border-radius:14px;border:1px solid #1C2742;background:rgba(255,255,255,.02)}
+    a{color:#9CCBFF;text-decoration:none}
+    .match{margin-top:10px;padding:12px;border-radius:14px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
     .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-    .score{font-weight:900}
-    .tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid #1C2742;background:rgba(255,255,255,.02)}
+    .tag{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02);text-decoration:none;color:#EAF0FF}
     .ok{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
     .ko{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
-    a{color:#9CCBFF;text-decoration:none}
+    .wait{border-color:rgba(255,176,32,.35);background:rgba(255,176,32,.10)}
     footer{margin:18px 0 6px;text-align:center;color:#A9B4D0;font-size:12px}
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
-    <h1>LES ÉLITES EFOOTPRO — Matchs</h1>
-    <div class="sub">Format : Élimination directe · Défaite = élimination</div>
-    <div class="sub"><a href="index.html">← Accueil</a> · <a href="eliminations.html">Voir les éliminations</a></div>
+    <h1>Matchs — 1er tour (R32)</h1>
+    <div class="sub"><a href="index.html">← Accueil</a> · <a href="eliminations.html">Éliminations</a></div>
+    <div class="sub">Format : Élimination directe · 📸 Preuve recommandée</div>
   </div>
 
   <div id="matchList"></div>
@@ -34,33 +34,52 @@
 </div>
 
 <script>
-(async function () {
+(async function(){
   const res = await fetch("./data.json", { cache: "no-store" });
   const data = await res.json();
 
+  const playersById = Object.fromEntries(data.players.map(p => [p.id, p]));
   const list = document.getElementById("matchList");
   list.innerHTML = "";
 
   data.matches.forEach(m => {
+    const a = playersById[m.aId];
+    const b = playersById[m.bId];
+
     const done = m.status === "TERMINE";
     const scoreTxt = done ? `${m.scoreA} - ${m.scoreB}` : "À jouer";
-    const winnerTag = done ? `<span class="tag ok">🟢 ${m.winner} — QUALIFIÉ</span>` : "";
-    const loserTag  = done ? `<span class="tag ko">🔴 ${m.loser} — ÉLIMINÉ</span>` : "";
+
+    let winnerTag = "";
+    let loserTag = "";
+    if(done){
+      const w = playersById[m.winnerId];
+      const l = playersById[m.loserId];
+      winnerTag = `<span class="tag ok">🟢 ${w.name} — QUALIFIÉ</span>`;
+      loserTag  = `<span class="tag ko">🔴 ${l.name} — ÉLIMINÉ</span>`;
+    } else {
+      winnerTag = `<span class="tag wait">🟠 Match en attente</span>`;
+    }
+
+    const proofBtn = m.proofUrl
+      ? `<a class="tag" href="${m.proofUrl}" target="_blank" rel="noopener">📸 Voir la preuve</a>`
+      : `<span class="tag">📸 Preuve non disponible</span>`;
 
     const div = document.createElement("div");
     div.className = "card";
     div.innerHTML = `
       <h2>${m.id.toUpperCase()} · ${m.round}</h2>
-      <div class="sub">${m.a} vs ${m.b}</div>
+      <div class="sub">${a.name} vs ${b.name}</div>
 
       <div class="match">
         <div class="row">
-          <div class="score">Score : ${scoreTxt}</div>
-          <div class="sub">Statut : <b>${m.status}</b></div>
+          <div><b>Score :</b> ${scoreTxt}</div>
+          <div class="sub"><b>Statut :</b> ${m.status}</div>
         </div>
+
         <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
           ${winnerTag}
           ${loserTag}
+          ${proofBtn}
         </div>
       </div>
     `;
