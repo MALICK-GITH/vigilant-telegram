@@ -4,31 +4,48 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LES ÉLITES EFOOTPRO — Accueil</title>
-  <style>
-    :root{--bg:#070A0F;--card:#0E1422;--txt:#EAF0FF;--muted:#A9B4D0;--line:#1C2742;--green:#25D366;--shadow:0 12px 40px rgba(0,0,0,.45);--r:18px}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,Arial}
-    .wrap{max-width:900px;margin:auto;padding:22px}
-    .card{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(14,20,34,.92),rgba(11,16,32,.92));box-shadow:var(--shadow);padding:18px}
-    h1{margin:0;font-size:18px}
-    .sub{margin-top:6px;color:var(--muted);font-size:13px}
-    a.btn{display:block;margin-top:12px;padding:14px 16px;border-radius:14px;text-decoration:none;color:var(--txt);
-      border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02);font-weight:900}
-    a.btn:hover{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.08)}
-    footer{margin:18px 0 6px;text-align:center;color:var(--muted);font-size:12px}
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
+  <header class="header">
     <h1>LES ÉLITES <span style="color:var(--green)">EFOOTPRO</span></h1>
     <div class="sub">Tournoi eFootball Mobile — Élimination directe</div>
+    <nav class="nav">
+      <a href="index.html" class="nav-btn active">🏠 Accueil</a>
+      <a href="candidats.html" class="nav-btn">👥 Candidats</a>
+      <a href="matchs.html" class="nav-btn">⚽ Matchs</a>
+      <a href="eliminations.html" class="nav-btn">🔴 Éliminations</a>
+      <a href="reglement.html" class="nav-btn">📜 Règlement</a>
+      <a href="admin.html" class="nav-btn">⚙️ Admin</a>
+    </nav>
+  </header>
 
-    <a class="btn" href="candidats.html">👥 Candidats (32)</a>
-    <a class="btn" href="matchs.html">⚽ Matchs (R32)</a>
-    <a class="btn" href="eliminations.html">🔴 Éliminations</a>
+  <div class="card">
+    <h2>Bienvenue sur le tournoi</h2>
+    <div class="sub">Suivez l'évolution des matchs et des joueurs en temps réel</div>
 
-    <div class="sub" style="margin-top:12px;">Test rapide : ouvre <b>/data.json</b> sur ton site pour vérifier la base.</div>
+    <div class="row" style="margin-top:16px;gap:12px;">
+      <div class="card" style="flex:1;min-width:200px;">
+        <h3>👥 Candidats</h3>
+        <div class="sub">32 joueurs en compétition</div>
+        <a class="btn" href="candidats.html" style="margin-top:8px;">Voir les joueurs</a>
+      </div>
+      
+      <div class="card" style="flex:1;min-width:200px;">
+        <h3>⚽ Matchs</h3>
+        <div class="sub">Tour R32 en cours</div>
+        <a class="btn" href="matchs.html" style="margin-top:8px;">Voir les matchs</a>
+      </div>
+      
+      <div class="card" style="flex:1;min-width:200px;">
+        <h3>🔴 Éliminations</h3>
+        <div class="sub">Joueurs éliminés</div>
+        <a class="btn" href="eliminations.html" style="margin-top:8px;">Voir les éliminations</a>
+      </div>
+    </div>
+
+    <div class="sub" style="margin-top:16px;">💡 Test rapide : ouvre <b>/data.json</b> sur ton site pour vérifier la base.</div>
   </div>
 
   <footer>Signé SOLITAIRE HACK 🇨🇮</footer>

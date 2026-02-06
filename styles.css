@@ -31,6 +31,39 @@ a:hover{text-decoration:underline}
 
 .wrap{max-width:980px;margin:0 auto;padding:22px}
 
+/* Header commun */
+.header{
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:linear-gradient(180deg, rgba(14,20,34,.95), rgba(11,16,32,.95));
+  box-shadow:var(--shadow);
+  padding:18px;
+  margin-bottom:16px;
+}
+
+.header h1{margin:0 0 8px;font-size:20px;letter-spacing:.5px}
+.header .sub{margin:0 0 12px;color:var(--muted);font-size:13px}
+.header .nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.header .nav-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 12px;border-radius:12px;border:1px solid rgba(28,39,66,.8);
+  background:rgba(255,255,255,.02);
+  color:var(--txt);
+  text-decoration:none;
+  font-weight:700;
+  font-size:13px;
+  transition:all 0.2s ease;
+}
+.header .nav-btn:hover{
+  border-color:rgba(37,211,102,.35);
+  background:rgba(37,211,102,.08);
+  text-decoration:none;
+}
+.header .nav-btn.active{
+  border-color:rgba(0,229,255,.35);
+  background:rgba(0,229,255,.10);
+}
+
 .card{
   margin-top:16px;
   border:1px solid var(--line);
@@ -56,9 +89,23 @@ h2{font-size:16px;letter-spacing:.3px}
   color:var(--txt);
   cursor:pointer;
   font-weight:800;
+  transition:all 0.2s ease;
 }
 .btn:hover{border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.06)}
 .btn.ghost{background:transparent}
+.btn.success{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
+.btn.danger{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .wrap{padding:16px}
+  .header{padding:14px;margin-bottom:12px}
+  .header h1{font-size:18px}
+  .header .nav{gap:6px}
+  .header .nav-btn{font-size:12px;padding:6px 10px}
+  .card{padding:14px;margin-top:12px}
+  .btn{padding:10px 12px;font-size:14px}
+}
 
 .tag{
   display:inline-flex;align-items:center;gap:8px;

@@ -88,9 +88,9 @@
 
     <div id="loginCard" class="card">
       <h2>Connexion Admin</h2>
-      <div class="sub">PIN par défaut : <b>0000</b></div>
+      <div class="sub">PIN par défaut : <b>6624</b></div>
       <label>Entrer le PIN</label>
-      <input id="pinInput" type="password" inputmode="numeric" placeholder="0000" />
+      <input id="pinInput" type="password" inputmode="numeric" placeholder="6624" />
       <div class="row" style="margin-top:12px">
         <button id="btnLogin" class="btn">✅ Se connecter</button>
         <button id="btnLogout" class="btn ghost hide">🚪 Se déconnecter</button>
@@ -138,6 +138,16 @@
             <input id="adminName" placeholder="SOLITAIRE HACK 🇨🇮" />
           </div>
         </div>
+        
+        <div class="card" style="margin-top:12px;">
+          <h3>Génération automatique des tours</h3>
+          <div class="sub">Génère automatiquement le tour suivant quand tous les matchs du round actuel sont terminés</div>
+          <div class="row" style="margin-top:10px;">
+            <button id="btnGenerateNext" class="btn success">🔄 Générer le tour suivant</button>
+            <div class="sub" id="generateStatus"></div>
+          </div>
+        </div>
+        
         <div class="list" id="matchesList" style="margin-top:12px"></div>
       </section>
 
@@ -214,6 +224,8 @@
 
     const newPin = document.getElementById("newPin");
     const btnChangePin = document.getElementById("btnChangePin");
+    const btnGenerateNext = document.getElementById("btnGenerateNext");
+    const generateStatus = document.getElementById("generateStatus");
 
     let data = null;
 
@@ -230,7 +242,7 @@
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
         .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
-    function getPin(){ return localStorage.getItem(PIN_KEY) || "0000"; }
+    function getPin(){ return localStorage.getItem(PIN_KEY) || "6624"; }
     function setPin(p){ localStorage.setItem(PIN_KEY, p); }
     function isAuthed(){ return localStorage.getItem(AUTH_KEY)==="1"; }
     function setAuthed(v){ localStorage.setItem(AUTH_KEY, v?"1":"0"); }
@@ -530,6 +542,101 @@
       debug("♻️ Reset OK (retour au data.json officiel).");
     });
 
+    function generateNextRoundFromCurrent(){
+      clearDebug();
+      generateStatus.textContent = "Analyse...";
+      
+      const order = ["R32","R16","QF","SF","F"];
+      let currentRound = null;
+      let nextRound = null;
+      
+      // Trouver le round actuel (premier avec des matchs non terminés)
+      for(let i = 0; i < order.length; i++){
+        const round = order[i];
+        const matches = (data.matches||[]).filter(m=>m.round===round);
+        if(matches.length > 0){
+          if(matches.some(m=>m.status!=="TERMINE")){
+            currentRound = round;
+            nextRound = order[i+1];
+            break;
+          } else if(i < order.length - 1){
+            // Tous les matchs sont terminés, on peut générer le suivant
+            currentRound = round;
+            nextRound = order[i+1];
+            break;
+          }
+        }
+      }
+      
+      if(!currentRound){
+        generateStatus.textContent = "❌ Aucun round trouvé";
+        return;
+      }
+      
+      if(!nextRound){
+        generateStatus.textContent = "✅ Tournoi terminé !";
+        return;
+      }
+      
+      // Vérifier que tous les matchs du round actuel sont terminés
+      const currentMatches = (data.matches||[]).filter(m=>m.round===currentRound);
+      if(currentMatches.some(m=>m.status!=="TERMINE")){
+        generateStatus.textContent = `❌ Tous les matchs du ${currentRound} doivent être terminés`;
+        return;
+      }
+      
+      // Vérifier que le prochain round n'existe pas déjà
+      const existingNext = (data.matches||[]).some(m=>m.round===nextRound);
+      if(existingNext){
+        generateStatus.textContent = `❌ Le round ${nextRound} existe déjà`;
+        return;
+      }
+      
+      try{
+        // Générer les gagnants
+        const winners = currentMatches.map(m=>m.winnerId).filter(Boolean);
+        if(winners.length % 2 !== 0){
+          generateStatus.textContent = `❌ Nombre de gagnants impair : ${winners.length}`;
+          return;
+        }
+        
+        // Créer les matchs du round suivant
+        const created = [];
+        let idx = (data.matches||[]).length + 1;
+        
+        for(let i = 0; i < winners.length; i += 2){
+          created.push({
+            id: "m" + String(idx++).padStart(2,"0"),
+            round: nextRound,
+            aId: winners[i],
+            bId: winners[i+1],
+            status: "A_JOUER"
+          });
+        }
+        
+        data.matches.push(...created);
+        
+        // Historique
+        data.history.unshift({
+          ts: new Date().toISOString(),
+          type: "ROUND_GENERATE",
+          actor: adminName.value || "Admin",
+          message: `Round ${nextRound} généré depuis ${currentRound} (${created.length} matchs).`
+        });
+        
+        saveData(data);
+        fillRoundFilter();
+        renderAll();
+        
+        generateStatus.textContent = `✅ ${created.length} matchs générés pour le round ${nextRound}`;
+        debug(`✅ Round ${nextRound} généré avec succès`);
+        
+      }catch(e){
+        generateStatus.textContent = `❌ Erreur: ${e.message}`;
+        debug("❌ Erreur génération: " + String(e.message||e));
+      }
+    }
+
     btnChangePin.addEventListener("click", ()=>{
       clearDebug();
       const p = (newPin.value||"").trim();
@@ -538,6 +645,8 @@
       newPin.value = "";
       debug("✅ PIN changé.");
     });
+
+    btnGenerateNext.addEventListener("click", generateNextRoundFromCurrent);
 
     playerSearch.addEventListener("input", renderPlayers);
     roundFilter.addEventListener("change", renderMatches);

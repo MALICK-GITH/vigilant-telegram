@@ -4,17 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Candidats — LES ÉLITES EFOOTPRO</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    :root{--bg:#070A0F;--card:#0E1422;--txt:#EAF0FF;--muted:#A9B4D0;--line:#1C2742;--ok:#25D366;--ko:#ff4d4d;--wait:#FFB020}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,Arial}
-    .wrap{max-width:980px;margin:0 auto;padding:18px}
-    .card{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(14,20,34,.92),rgba(11,16,32,.92));padding:16px;margin-top:14px}
-    h1{margin:0;font-size:20px}
-    .sub{margin-top:6px;color:var(--muted);font-size:13px}
-    a{color:#9CCBFF;text-decoration:none}
-    .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .item{padding:12px;border-radius:14px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
     .tag{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
     .ok{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
     .ko{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
@@ -22,16 +13,39 @@
     .proof{margin-top:10px}
     .proof img{width:100%;max-width:520px;border-radius:14px;border:1px solid var(--line);display:block}
     .debug{border:1px dashed rgba(0,229,255,.45);background:rgba(0,229,255,.07);border-radius:14px;padding:10px;color:#DDF9FF;font-size:12px;white-space:pre-wrap}
-    footer{margin:18px 0 6px;text-align:center;color:var(--muted);font-size:12px}
+    .filters{margin:12px 0;display:flex;gap:8px;flex-wrap:wrap}
+    .filter-btn{padding:6px 12px;border-radius:8px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02);color:var(--txt);cursor:pointer;font-size:12px;transition:all 0.2s ease}
+    .filter-btn.active{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,.10)}
+    .player-card{transition:all 0.2s ease}
+    .player-card:hover{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,.02)}
   </style>
 </head>
 <body>
   <div class="wrap">
+    <header class="header">
+      <h1>LES ÉLITES <span style="color:var(--green)">EFOOTPRO</span></h1>
+      <div class="sub">Tournoi eFootball Mobile — Élimination directe</div>
+      <nav class="nav">
+        <a href="index.html" class="nav-btn">🏠 Accueil</a>
+        <a href="candidats.html" class="nav-btn active">👥 Candidats</a>
+        <a href="matchs.html" class="nav-btn">⚽ Matchs</a>
+        <a href="eliminations.html" class="nav-btn">🔴 Éliminations</a>
+        <a href="reglement.html" class="nav-btn">📜 Règlement</a>
+        <a href="admin.html" class="nav-btn">⚙️ Admin</a>
+      </nav>
+    </header>
 
     <div class="card">
-      <h1>Candidats — LES ÉLITES <span style="color:var(--ok)">EFOOTPRO</span></h1>
-      <div class="sub"><a href="/index.html">← Accueil</a></div>
+      <h2>Candidats du tournoi</h2>
       <div class="sub">Statuts : 🟢 Qualifié · 🔴 Éliminé · 🟠 En attente</div>
+      
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Tous (32)</button>
+        <button class="filter-btn" data-filter="QUALIFIE">� Qualifiés</button>
+        <button class="filter-btn" data-filter="ELIMINE">🔴 Éliminés</button>
+        <button class="filter-btn" data-filter="EN_ATTENTE">�🟠 En attente</button>
+      </div>
+      
       <div id="debug" class="debug" style="margin-top:10px;display:none;"></div>
     </div>
 
@@ -44,6 +58,8 @@
 (function(){
   const debugEl = document.getElementById("debug");
   const listEl  = document.getElementById("list");
+  let currentFilter = "all";
+  let allPlayers = [];
 
   function debug(msg){
     debugEl.style.display = "block";
@@ -54,6 +70,79 @@
     if(status === "QUALIFIE") return `<span class="tag ok">🟢 QUALIFIÉ</span>`;
     if(status === "ELIMINE")  return `<span class="tag ko">🔴 ÉLIMINÉ</span>`;
     return `<span class="tag wait">🟠 EN ATTENTE</span>`;
+  }
+
+  function updateFilterCounts(players){
+    const counts = {
+      all: players.length,
+      QUALIFIE: players.filter(p=>p.status==="QUALIFIE").length,
+      ELIMINE: players.filter(p=>p.status==="ELIMINE").length,
+      EN_ATTENTE: players.filter(p=>p.status==="EN_ATTENTE").length
+    };
+    
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      const filter = btn.dataset.filter;
+      const count = counts[filter] || 0;
+      const label = filter === "all" ? "Tous" : 
+                   filter === "QUALIFIE" ? "🟢 Qualifiés" :
+                   filter === "ELIMINE" ? "🔴 Éliminés" : "🟠 En attente";
+      btn.textContent = `${label} (${count})`;
+    });
+  }
+
+  function renderPlayers(filter = "all"){
+    const filtered = filter === "all" ? allPlayers : allPlayers.filter(p => p.status === filter);
+    
+    listEl.innerHTML = "";
+    
+    if(filtered.length === 0){
+      listEl.innerHTML = `<div class="card">Aucun joueur trouvé pour ce filtre.</div>`;
+      return;
+    }
+
+    // Map preuve par joueur (dernier match terminé avec preuve)
+    const proofByPlayer = {};
+    const matches = window.tournamentData?.matches || [];
+    matches
+      .filter(m => m.status === "TERMINE" && m.proofUrl)
+      .forEach(m => {
+        proofByPlayer[m.aId] = m.proofUrl;
+        proofByPlayer[m.bId] = m.proofUrl;
+      });
+
+    filtered.forEach((p, idx) => {
+      const proof = proofByPlayer[p.id];
+
+      const proofBlock = proof
+        ? `<div class="proof">
+            <div class="sub">📸 Preuve (dernier match)</div>
+            <a href="${proof}" target="_blank" rel="noopener">
+              <img src="${proof}" alt="Preuve du score" loading="lazy">
+            </a>
+          </div>`
+        : `<div class="sub" style="margin-top:10px;">📸 Preuve : aucune</div>`;
+
+      const card = document.createElement("div");
+      card.className = "card player-card";
+      card.innerHTML = `
+        <div class="row" style="padding:12px;">
+          <div>
+            <div class="kicker">JOUEUR #${String(idx+1).padStart(2,"0")}</div>
+            <div class="big">${escapeHtml(p.name)}</div>
+            <div class="sub mono">${escapeHtml(p.id)}</div>
+          </div>
+          ${tagFor(p.status)}
+        </div>
+        ${proofBlock}
+      `;
+      listEl.appendChild(card);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
   }
 
   async function main(){
@@ -85,49 +174,22 @@
       return;
     }
 
-    const players = data.players || [];
-    const matches = data.matches || [];
+    window.tournamentData = data;
+    allPlayers = data.players || [];
 
-    debug(`OK: data.json chargé.\nPlayers: ${players.length}\nMatches: ${matches.length}\nURL: ${url}`);
+    debug(`OK: data.json chargé.\nPlayers: ${allPlayers.length}\nMatches: ${(data.matches||[]).length}\nURL: ${url}`);
 
-    // Map preuve par joueur (dernier match terminé avec preuve)
-    const proofByPlayer = {};
-    matches
-      .filter(m => m.status === "TERMINE" && m.proofUrl)
-      .forEach(m => {
-        proofByPlayer[m.aId] = m.proofUrl;
-        proofByPlayer[m.bId] = m.proofUrl;
+    updateFilterCounts(allPlayers);
+    renderPlayers(currentFilter);
+
+    // Gestion des filtres
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderPlayers(currentFilter);
       });
-
-    listEl.innerHTML = "";
-
-    if(players.length === 0){
-      listEl.innerHTML = `<div class="card">Aucun joueur trouvé dans data.json.</div>`;
-      return;
-    }
-
-    players.forEach((p, idx) => {
-      const proof = proofByPlayer[p.id];
-
-      const proofBlock = proof
-        ? `<div class="proof">
-            <div class="sub">📸 Preuve (dernier match)</div>
-            <a href="${proof}" target="_blank" rel="noopener">
-              <img src="${proof}" alt="Preuve du score" loading="lazy">
-            </a>
-          </div>`
-        : `<div class="sub" style="margin-top:10px;">📸 Preuve : aucune</div>`;
-
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="row item">
-          <div><b>${String(idx+1).padStart(2,"0")}.</b> ${p.name}</div>
-          ${tagFor(p.status)}
-        </div>
-        ${proofBlock}
-      `;
-      listEl.appendChild(card);
     });
   }
 
