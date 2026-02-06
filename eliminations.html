@@ -30,11 +30,19 @@
 
 <script>
 (async function(){
-  const res = await fetch("./data.json", { cache: "no-store" });
-  const data = await res.json();
-
-  const elim = data.players.filter(p => p.status === "ELIMINE");
   const box = document.getElementById("elimBox");
+
+  let res;
+  try { res = await fetch("/data.json", { cache: "no-store" }); }
+  catch(e){ box.innerHTML = `<b>Erreur réseau :</b> impossible de charger data.json`; return; }
+
+  if(!res.ok){
+    box.innerHTML = `<b>Erreur :</b> data.json introuvable (${res.status})`;
+    return;
+  }
+
+  const data = await res.json();
+  const elim = (data.players || []).filter(p => p.status === "ELIMINE");
 
   box.innerHTML = `<h2>Joueurs éliminés (${elim.length})</h2>`;
 

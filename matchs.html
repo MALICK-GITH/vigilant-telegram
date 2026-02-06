@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LES ÉLITES EFOOTPRO — Matchs</title>
+  <title>LES ÉLITES EFOOTPRO — Candidats</title>
   <style>
     body{margin:0;background:#070A0F;color:#EAF0FF;font-family:system-ui,Arial}
     .wrap{max-width:900px;margin:auto;padding:22px}
@@ -11,9 +11,9 @@
     h1,h2{margin:0}
     .sub{color:#A9B4D0;margin-top:6px;font-size:13px}
     a{color:#9CCBFF;text-decoration:none}
-    .match{margin-top:10px;padding:12px;border-radius:14px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
-    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-    .tag{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02);text-decoration:none;color:#EAF0FF}
+    .item{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid rgba(28,39,66,.65)}
+    .item:last-child{border-bottom:none}
+    .tag{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
     .ok{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
     .ko{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
     .wait{border-color:rgba(255,176,32,.35);background:rgba(255,176,32,.10)}
@@ -23,67 +23,52 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <h1>Matchs — 1er tour (R32)</h1>
-    <div class="sub"><a href="index.html">← Accueil</a> · <a href="eliminations.html">Éliminations</a></div>
-    <div class="sub">Format : Élimination directe · 📸 Preuve recommandée</div>
+    <h1>Candidats — LES ÉLITES EFOOTPRO</h1>
+    <div class="sub"><a href="index.html">← Accueil</a></div>
+    <div class="sub">Statuts : 🟢 Qualifié · 🔴 Éliminé · 🟠 En attente</div>
   </div>
 
-  <div id="matchList"></div>
+  <div id="list"></div>
 
   <footer>Signé SOLITAIRE HACK 🇨🇮</footer>
 </div>
 
 <script>
 (async function(){
-  const res = await fetch("./data.json", { cache: "no-store" });
+  const box = document.getElementById("list");
+
+  let res;
+  try { res = await fetch("/data.json", { cache: "no-store" }); }
+  catch(e){ box.innerHTML = `<div class="card"><b>Erreur réseau :</b> impossible de charger data.json</div>`; return; }
+
+  if(!res.ok){
+    box.innerHTML = `<div class="card"><b>Erreur :</b> data.json introuvable (${res.status})</div>`;
+    return;
+  }
+
   const data = await res.json();
+  if(!data.players || data.players.length === 0){
+    box.innerHTML = `<div class="card">Aucun joueur trouvé.</div>`;
+    return;
+  }
 
-  const playersById = Object.fromEntries(data.players.map(p => [p.id, p]));
-  const list = document.getElementById("matchList");
-  list.innerHTML = "";
+  function tagFor(status){
+    if(status === "QUALIFIE") return `<span class="tag ok">🟢 QUALIFIÉ</span>`;
+    if(status === "ELIMINE")  return `<span class="tag ko">🔴 ÉLIMINÉ</span>`;
+    return `<span class="tag wait">🟠 EN ATTENTE</span>`;
+  }
 
-  data.matches.forEach(m => {
-    const a = playersById[m.aId];
-    const b = playersById[m.bId];
-
-    const done = m.status === "TERMINE";
-    const scoreTxt = done ? `${m.scoreA} - ${m.scoreB}` : "À jouer";
-
-    let winnerTag = "";
-    let loserTag = "";
-    if(done){
-      const w = playersById[m.winnerId];
-      const l = playersById[m.loserId];
-      winnerTag = `<span class="tag ok">🟢 ${w.name} — QUALIFIÉ</span>`;
-      loserTag  = `<span class="tag ko">🔴 ${l.name} — ÉLIMINÉ</span>`;
-    } else {
-      winnerTag = `<span class="tag wait">🟠 Match en attente</span>`;
-    }
-
-    const proofBtn = m.proofUrl
-      ? `<a class="tag" href="${m.proofUrl}" target="_blank" rel="noopener">📸 Voir la preuve</a>`
-      : `<span class="tag">📸 Preuve non disponible</span>`;
-
+  box.innerHTML = "";
+  data.players.forEach((p, idx) => {
     const div = document.createElement("div");
     div.className = "card";
     div.innerHTML = `
-      <h2>${m.id.toUpperCase()} · ${m.round}</h2>
-      <div class="sub">${a.name} vs ${b.name}</div>
-
-      <div class="match">
-        <div class="row">
-          <div><b>Score :</b> ${scoreTxt}</div>
-          <div class="sub"><b>Statut :</b> ${m.status}</div>
-        </div>
-
-        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-          ${winnerTag}
-          ${loserTag}
-          ${proofBtn}
-        </div>
+      <div class="item">
+        <div><b>${String(idx+1).padStart(2,"0")}.</b> ${p.name}</div>
+        ${tagFor(p.status)}
       </div>
     `;
-    list.appendChild(div);
+    box.appendChild(div);
   });
 })();
 </script>
