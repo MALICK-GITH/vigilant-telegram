@@ -96,7 +96,9 @@
         <button id="btnLogout" class="btn ghost hide">🚪 Se déconnecter</button>
       </div>
       <div class="sub" style="margin-top:10px">
-        ⚠️ Site statique : tout est enregistré sur <b>ton téléphone</b> (localStorage). Pour publier à tous : <b>Export JSON</b> puis remplace <b>data.json</b> sur le dépôt.
+        ⚠️ <b>IMPORTANT</b> : Les modifications sont locales (votre navigateur).<br>
+        📤 <b>Pour sauvegarder</b> : Export JSON → Copiez dans data.json → Push sur GitHub.<br>
+        🔄 Vercel mettra à jour le site automatiquement après le push.
       </div>
     </div>
 
@@ -156,9 +158,16 @@
         <div class="row2">
           <div class="card" style="flex:1">
             <h2>📤 Export JSON</h2>
-            <div class="sub">Télécharge les données actuelles.</div>
+            <div class="sub">Télécharge les données actuelles <b>après modifications</b>.</div>
             <div class="row" style="margin-top:10px">
               <button id="btnExport" class="btn">📤 Télécharger</button>
+            </div>
+            <div class="sub" style="margin-top:8px; color:var(--amber);">
+              💡 <b>Étapes suivantes</b> :<br>
+              1. Ouvrez le fichier téléchargé<br>
+              2. Copiez tout le contenu<br>
+              3. Remplacez data.json sur GitHub<br>
+              4. Push → Vercel met à jour automatiquement
             </div>
           </div>
           <div class="card" style="flex:1">
