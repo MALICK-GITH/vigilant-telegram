@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LES ÉLITES EFOOTPRO — Éliminations</title>
+  <style>
+    body{margin:0;background:#070A0F;color:#EAF0FF;font-family:system-ui,Arial}
+    .wrap{max-width:900px;margin:auto;padding:22px}
+    .card{border:1px solid #1C2742;border-radius:18px;background:#0E1422;padding:18px;margin-top:14px}
+    h1,h2{margin:0}
+    .sub{color:#A9B4D0;margin-top:6px;font-size:13px}
+    a{color:#9CCBFF;text-decoration:none}
+    .item{margin-top:10px;padding:12px;border-radius:14px;border:1px solid rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
+    footer{margin:18px 0 6px;text-align:center;color:#A9B4D0;font-size:12px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Éliminations officielles</h1>
+    <div class="sub"><a href="index.html">← Accueil</a> · <a href="matchs.html">Matchs</a></div>
+    <div class="sub">Liste mise à jour selon les résultats validés.</div>
+  </div>
+
+  <div class="card" id="elimBox"></div>
+
+  <footer>Signé SOLITAIRE HACK 🇨🇮</footer>
+</div>
+
+<script>
+(async function(){
+  const box = document.getElementById("elimBox");
+
+  let res;
+  try { res = await fetch("/data.json", { cache: "no-store" }); }
+  catch(e){ box.innerHTML = `<b>Erreur réseau :</b> impossible de charger data.json`; return; }
+
+  if(!res.ok){
+    box.innerHTML = `<b>Erreur :</b> data.json introuvable (${res.status})`;
+    return;
+  }
+
+  const data = await res.json();
+  const elim = (data.players || []).filter(p => p.status === "ELIMINE");
+
+  box.innerHTML = `<h2>Joueurs éliminés (${elim.length})</h2>`;
+
+  if(elim.length === 0){
+    box.innerHTML += `<div class="sub" style="margin-top:10px;">Aucune élimination enregistrée.</div>`;
+    return;
+  }
+
+  elim.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.textContent = `🔴 ${p.name}`;
+    box.appendChild(div);
+  });
+})();
+</script>
+</body>
+</html>
