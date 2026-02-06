@@ -25,6 +25,7 @@
   <div class="card">
     <h1>Candidats — LES ÉLITES EFOOTPRO</h1>
     <div class="sub"><a href="index.html">← Accueil</a></div>
+    <div class="sub">Statuts : 🟢 Qualifié · 🔴 Éliminé · 🟠 En attente</div>
   </div>
 
   <div id="list"></div>
@@ -34,11 +35,22 @@
 
 <script>
 (async function(){
-  const res = await fetch("./data.json", { cache: "no-store" });
-  const data = await res.json();
-
   const box = document.getElementById("list");
-  box.innerHTML = `<div class="card"><h2>Liste officielle (32)</h2><div class="sub">Statuts : 🟢 Qualifié · 🔴 Éliminé · 🟠 En attente</div></div>`;
+
+  let res;
+  try { res = await fetch("/data.json", { cache: "no-store" }); }
+  catch(e){ box.innerHTML = `<div class="card"><b>Erreur réseau :</b> impossible de charger data.json</div>`; return; }
+
+  if(!res.ok){
+    box.innerHTML = `<div class="card"><b>Erreur :</b> data.json introuvable (${res.status})</div>`;
+    return;
+  }
+
+  const data = await res.json();
+  if(!data.players || data.players.length === 0){
+    box.innerHTML = `<div class="card">Aucun joueur trouvé.</div>`;
+    return;
+  }
 
   function tagFor(status){
     if(status === "QUALIFIE") return `<span class="tag ok">🟢 QUALIFIÉ</span>`;
@@ -46,6 +58,7 @@
     return `<span class="tag wait">🟠 EN ATTENTE</span>`;
   }
 
+  box.innerHTML = "";
   data.players.forEach((p, idx) => {
     const div = document.createElement("div");
     div.className = "card";
