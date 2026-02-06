@@ -1,34 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Candidats — LES ÉLITES EFOOTPRO</title>
+  <style>
+    :root{--bg:#070A0F;--card:#0E1422;--txt:#EAF0FF;--muted:#A9B4D0;--line:#1C2742;--ok:#25D366;--ko:#ff4d4d;--wait:#FFB020}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,Arial}
+    .wrap{max-width:980px;margin:0 auto;padding:18px}
+    .card{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(14,20,34,.92),rgba(11,16,32,.92));padding:16px;margin-top:14px}
+    h1{margin:0;font-size:20px}
+    .sub{margin-top:6px;color:var(--muted);font-size:13px}
+    a{color:#9CCBFF;text-decoration:none}
+    .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .item{padding:12px;border-radius:14px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
+    .tag{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(28,39,66,.8);background:rgba(255,255,255,.02)}
+    .ok{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
+    .ko{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
+    .wait{border-color:rgba(255,176,32,.35);background:rgba(255,176,32,.10)}
+    .proof{margin-top:10px}
+    .proof img{width:100%;max-width:520px;border-radius:14px;border:1px solid var(--line);display:block}
+    .debug{border:1px dashed rgba(0,229,255,.45);background:rgba(0,229,255,.07);border-radius:14px;padding:10px;color:#DDF9FF;font-size:12px;white-space:pre-wrap}
+    footer{margin:18px 0 6px;text-align:center;color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="card">
+      <h1>Candidats — LES ÉLITES <span style="color:var(--ok)">EFOOTPRO</span></h1>
+      <div class="sub"><a href="/index.html">← Accueil</a></div>
+      <div class="sub">Statuts : 🟢 Qualifié · 🔴 Éliminé · 🟠 En attente</div>
+      <div id="debug" class="debug" style="margin-top:10px;display:none;"></div>
+    </div>
+
+    <div id="list"></div>
+
+    <footer>Signé SOLITAIRE HACK 🇨🇮</footer>
+  </div>
+
 <script>
-(async function(){
-  const box = document.getElementById("list");
+(function(){
+  const debugEl = document.getElementById("debug");
+  const listEl  = document.getElementById("list");
 
-  let res;
-  try { res = await fetch("/data.json?ts=" + Date.now(), { cache: "no-store" }); }
-  catch(e){ box.innerHTML = `<div class="card"><b>Erreur réseau :</b> impossible de charger data.json</div>`; return; }
-
-  if(!res.ok){
-    box.innerHTML = `<div class="card"><b>Erreur :</b> data.json introuvable (${res.status})</div>`;
-    return;
+  function debug(msg){
+    debugEl.style.display = "block";
+    debugEl.textContent = msg;
   }
-
-  const data = await res.json();
-  const players = data.players || [];
-  const matches = data.matches || [];
-
-  if(players.length === 0){
-    box.innerHTML = `<div class="card">Aucun joueur trouvé.</div>`;
-    return;
-  }
-
-  // ✅ Map: playerId -> dernière preuve trouvée (dans un match terminé)
-  const lastProofByPlayer = {};
-  matches
-    .filter(m => m.status === "TERMINE" && m.proofUrl)
-    .forEach(m => {
-      // On attribue la même preuve aux 2 joueurs du match
-      lastProofByPlayer[m.aId] = m.proofUrl;
-      lastProofByPlayer[m.bId] = m.proofUrl;
-    });
 
   function tagFor(status){
     if(status === "QUALIFIE") return `<span class="tag ok">🟢 QUALIFIÉ</span>`;
@@ -36,37 +56,83 @@
     return `<span class="tag wait">🟠 EN ATTENTE</span>`;
   }
 
-  box.innerHTML = "";
+  async function main(){
+    listEl.innerHTML = `<div class="card"><div class="sub">Chargement des candidats...</div></div>`;
 
-  players.forEach((p, idx) => {
-    const proof = lastProofByPlayer[p.id];
+    const url = "/data.json?ts=" + Date.now();
+    let res;
 
-    const proofMini = proof
-      ? `
-        <div style="margin-top:10px;">
-          <div class="sub">📸 Dernière preuve</div>
-          <a href="${proof}" target="_blank" rel="noopener">
-            <img
-              src="${proof}"
-              alt="Preuve du joueur"
-              style="width:100%;max-width:420px;border-radius:14px;border:1px solid #1C2742;display:block;margin-top:6px;"
-              loading="lazy"
-            />
-          </a>
+    try {
+      res = await fetch(url, { cache: "no-store" });
+    } catch (e) {
+      debug("ERREUR: fetch(data.json) a échoué.\n" + String(e));
+      listEl.innerHTML = "";
+      return;
+    }
+
+    if(!res.ok){
+      debug(`ERREUR: data.json introuvable (HTTP ${res.status}).\nVérifie que /data.json existe sur ton site.`);
+      listEl.innerHTML = "";
+      return;
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      debug("ERREUR: data.json n'est pas un JSON valide.\n" + String(e));
+      listEl.innerHTML = "";
+      return;
+    }
+
+    const players = data.players || [];
+    const matches = data.matches || [];
+
+    debug(`OK: data.json chargé.\nPlayers: ${players.length}\nMatches: ${matches.length}\nURL: ${url}`);
+
+    // Map preuve par joueur (dernier match terminé avec preuve)
+    const proofByPlayer = {};
+    matches
+      .filter(m => m.status === "TERMINE" && m.proofUrl)
+      .forEach(m => {
+        proofByPlayer[m.aId] = m.proofUrl;
+        proofByPlayer[m.bId] = m.proofUrl;
+      });
+
+    listEl.innerHTML = "";
+
+    if(players.length === 0){
+      listEl.innerHTML = `<div class="card">Aucun joueur trouvé dans data.json.</div>`;
+      return;
+    }
+
+    players.forEach((p, idx) => {
+      const proof = proofByPlayer[p.id];
+
+      const proofBlock = proof
+        ? `<div class="proof">
+            <div class="sub">📸 Preuve (dernier match)</div>
+            <a href="${proof}" target="_blank" rel="noopener">
+              <img src="${proof}" alt="Preuve du score" loading="lazy">
+            </a>
+          </div>`
+        : `<div class="sub" style="margin-top:10px;">📸 Preuve : aucune</div>`;
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="row item">
+          <div><b>${String(idx+1).padStart(2,"0")}.</b> ${p.name}</div>
+          ${tagFor(p.status)}
         </div>
-      `
-      : `<div class="sub" style="margin-top:10px;">📸 Preuve : aucune</div>`;
+        ${proofBlock}
+      `;
+      listEl.appendChild(card);
+    });
+  }
 
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <div class="item">
-        <div><b>${String(idx+1).padStart(2,"0")}.</b> ${p.name}</div>
-        ${tagFor(p.status)}
-      </div>
-      ${proofMini}
-    `;
-    box.appendChild(div);
-  });
+  main();
 })();
 </script>
+</body>
+</html>
