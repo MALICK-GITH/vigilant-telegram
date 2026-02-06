@@ -5,61 +5,68 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LES ÉLITES EFOOTPRO — Matchs</title>
   <style>
-    :root{--bg:#070A0F;--card:#0E1422;--txt:#EAF0FF;--muted:#A9B4D0;--line:#1C2742;--green:#25D366;--amber:#FFB020;--shadow:0 12px 40px rgba(0,0,0,.45);--r:18px}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,Arial}
+    body{margin:0;background:#070A0F;color:#EAF0FF;font-family:system-ui,Arial}
     .wrap{max-width:900px;margin:auto;padding:22px}
-    header,.card{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(14,20,34,.92),rgba(11,16,32,.92));box-shadow:var(--shadow);padding:18px}
+    .card{border:1px solid #1C2742;border-radius:18px;background:#0E1422;padding:18px;margin-top:14px}
     h1,h2{margin:0}
-    .sub{margin-top:6px;color:var(--muted);font-size:13px}
-    .card{margin-top:16px;background:linear-gradient(180deg,rgba(14,20,34,.85),rgba(11,16,32,.85))}
-    .match{padding:12px 10px;border-bottom:1px solid rgba(28,39,66,.65)}
-    .match:last-child{border-bottom:none}
-    .vs{color:var(--amber);font-weight:900}
-    .mno{color:var(--muted);font-weight:900;margin-right:8px}
+    .sub{color:#A9B4D0;margin-top:6px;font-size:13px}
+    .match{margin-top:10px;padding:12px;border-radius:14px;border:1px solid #1C2742;background:rgba(255,255,255,.02)}
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+    .score{font-weight:900}
+    .tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid #1C2742;background:rgba(255,255,255,.02)}
+    .ok{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.10)}
+    .ko{border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
     a{color:#9CCBFF;text-decoration:none}
-    footer{margin:18px 0 6px;text-align:center;color:var(--muted);font-size:12px}
+    footer{margin:18px 0 6px;text-align:center;color:#A9B4D0;font-size:12px}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>LES ÉLITES <span style="color:var(--green)">EFOOTPRO</span></h1>
-      <div class="sub">⚽ Matchs officiels — 1er tour (Élimination directe)</div>
-      <div class="sub"><a href="index.html">← Retour accueil</a></div>
-    </header>
-
-    <section class="card">
-      <h2>Matchs à jouer</h2>
-      <div class="sub">Format : élimination directe — le perdant est éliminé.</div>
-
-      <!-- 16 matchs du 1er tour -->
-      <div class="match"><span class="mno">Match 01</span> SOLITAIRE HACKci <span class="vs">VS</span> le proverbe africain</div>
-      <div class="match"><span class="mno">Match 02</span> Charme Boy <span class="vs">VS</span> BEN BLOOM</div>
-      <div class="match"><span class="mno">Match 03</span> Deku <span class="vs">VS</span> +225 0152553426</div>
-      <div class="match"><span class="mno">Match 04</span> +225 0161135102 <span class="vs">VS</span> +225 0170751387</div>
-      <div class="match"><span class="mno">Match 05</span> +225 0170892643 <span class="vs">VS</span> +225 0172189176</div>
-      <div class="match"><span class="mno">Match 06</span> +225 0172200813 <span class="vs">VS</span> +225 0501154431</div>
-      <div class="match"><span class="mno">Match 07</span> +225 0507607690 <span class="vs">VS</span> +225 0544008930</div>
-      <div class="match"><span class="mno">Match 08</span> +225 0554658075 <span class="vs">VS</span> +225 0565931689</div>
-      <div class="match"><span class="mno">Match 09</span> +225 0594301045 <span class="vs">VS</span> +225 0596203053</div>
-      <div class="match"><span class="mno">Match 10</span> +225 0715079633 <span class="vs">VS</span> +225 0717910982</div>
-      <div class="match"><span class="mno">Match 11</span> +225 0789196655 <span class="vs">VS</span> +225 0789294004</div>
-      <div class="match"><span class="mno">Match 12</span> +225 0797378566 <span class="vs">VS</span> +225 0797692995</div>
-      <div class="match"><span class="mno">Match 13</span> ~ Moilime 😎💗 <span class="vs">VS</span> ~ EL Hassan Fofana</div>
-      <div class="match"><span class="mno">Match 14</span> ~ Ålâdjî EB~13 <span class="vs">VS</span> ~ Mr Coulibaly 😎</div>
-      <div class="match"><span class="mno">Match 15</span> +226 56 47 21 02 <span class="vs">VS</span> +229 65 87 26 50</div>
-      <div class="match"><span class="mno">Match 16</span> +237 6 72 31 05 92 <span class="vs">VS</span> +225 0151468346</div>
-    </section>
-
-    <section class="card">
-      <h2>Règlement (résumé)</h2>
-      <div class="sub">
-        📸 Capture obligatoire · 📵 Déconnexion = défaite · 🚫 Triche/insultes = exclusion
-      </div>
-    </section>
-
-    <footer>Signé SOLITAIRE HACK 🇨🇮</footer>
+<div class="wrap">
+  <div class="card">
+    <h1>LES ÉLITES EFOOTPRO — Matchs</h1>
+    <div class="sub">Format : Élimination directe · Défaite = élimination</div>
+    <div class="sub"><a href="index.html">← Accueil</a> · <a href="eliminations.html">Voir les éliminations</a></div>
   </div>
+
+  <div id="matchList"></div>
+
+  <footer>Signé SOLITAIRE HACK 🇨🇮</footer>
+</div>
+
+<script>
+(async function () {
+  const res = await fetch("./data.json", { cache: "no-store" });
+  const data = await res.json();
+
+  const list = document.getElementById("matchList");
+  list.innerHTML = "";
+
+  data.matches.forEach(m => {
+    const done = m.status === "TERMINE";
+    const scoreTxt = done ? `${m.scoreA} - ${m.scoreB}` : "À jouer";
+    const winnerTag = done ? `<span class="tag ok">🟢 ${m.winner} — QUALIFIÉ</span>` : "";
+    const loserTag  = done ? `<span class="tag ko">🔴 ${m.loser} — ÉLIMINÉ</span>` : "";
+
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <h2>${m.id.toUpperCase()} · ${m.round}</h2>
+      <div class="sub">${m.a} vs ${m.b}</div>
+
+      <div class="match">
+        <div class="row">
+          <div class="score">Score : ${scoreTxt}</div>
+          <div class="sub">Statut : <b>${m.status}</b></div>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+          ${winnerTag}
+          ${loserTag}
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+})();
+</script>
 </body>
 </html>

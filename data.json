@@ -1,0 +1,32 @@
+{
+  "players": [
+    { "id": "p1", "name": "SOLITAIRE HACKci", "status": "ELIMINE" },
+    { "id": "p2", "name": "le proverbe africain", "status": "QUALIFIE" },
+    { "id": "p5", "name": "Deku", "status": "QUALIFIE" },
+    { "id": "p11", "name": "+225 0152553426", "status": "ELIMINE" }
+  ],
+  "matches": [
+    {
+      "id": "m01",
+      "round": "R32",
+      "a": "Deku",
+      "b": "+225 0152553426",
+      "scoreA": 5,
+      "scoreB": 3,
+      "winner": "Deku",
+      "loser": "+225 0152553426",
+      "status": "TERMINE"
+    },
+    {
+      "id": "m02",
+      "round": "R32",
+      "a": "le proverbe africain",
+      "b": "SOLITAIRE HACKci",
+      "scoreA": 5,
+      "scoreB": 2,
+      "winner": "le proverbe africain",
+      "loser": "SOLITAIRE HACKci",
+      "status": "TERMINE"
+    }
+  ]
+}
