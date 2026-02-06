@@ -824,17 +824,37 @@
     playerSearch.addEventListener("input", renderPlayers);
     roundFilter.addEventListener("change", renderMatches);
 
-    btnLogin.addEventListener("click", async ()=>{
+    // Test de base au chargement
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log('Page admin chargée');
+      console.log('PIN_KEY:', PIN_KEY);
+      console.log('AUTH_KEY:', AUTH_KEY);
+      
+      // Test simple
+      const testPin = "6624";
+      console.log('Test PIN:', testPin);
+      
+      // Vérifier si les éléments existent
+      console.log('btnLogin existe:', !!btnLogin);
+      console.log('pinInput existe:', !!pinInput);
+      console.log('debugEl existe:', !!debugEl);
+    });
+
+    btnLogin.addEventListener("click", async (e)=>{
+      e.preventDefault(); // Empêcher le rechargement
+      console.log('Click sur connexion détecté');
+      
       clearDebug();
       const pin = (pinInput.value||"").trim();
-      
-      debug(`Test connexion avec PIN: "${pin}"`);
+      console.log('PIN tapé:', pin);
       
       if(pin !== "6624"){ 
-        debug("❌ Mauvais PIN. Le PIN correct est 6624"); 
+        debug("❌ Mauvais PIN. Tapez exactement: 6624"); 
+        console.log('Échec: pin != 6624');
         return; 
       }
 
+      console.log('PIN correct, connexion en cours...');
       setAuthed(true);
       btnLogout.classList.remove("hide");
       loginCard.classList.add("hide");
@@ -842,12 +862,14 @@
 
       try{
         data = await loadData();
+        console.log('Données chargées:', data);
         if(!adminName.value) adminName.value = "SOLITAIRE HACK 🇨🇮";
         fillRoundFilter();
         renderAll();
         showTab("dash");
         debug("✅ Connecté avec succès !");
       }catch(e){
+        console.error('Erreur lors du chargement:', e);
         debug("❌ Erreur: " + String(e.message||e));
       }
     });
