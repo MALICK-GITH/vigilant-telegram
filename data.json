@@ -2,6 +2,7 @@
   "config": {
     "tournamentName": "LES ÉLITES EFOOTPRO",
     "mode": "Élimination directe",
+    "finalDate": "2026-02-07",
     "rules": [
       "Match unique",
       "Pas d’égalité",
@@ -12,50 +13,50 @@
   },
 
   "players": [
-    { "id": "p1", "name": "SOLITAIRE HACKci", "status": "ELIMINE" },
-    { "id": "p2", "name": "le proverbe africain", "status": "QUALIFIE" },
-    { "id": "p3", "name": "Joueur 03", "status": "ELIMINE" },
-    { "id": "p4", "name": "Joueur 04", "status": "ELIMINE" },
-    { "id": "p5", "name": "Deku", "status": "QUALIFIE" },
-    { "id": "p6", "name": "Joueur 06", "status": "ELIMINE" },
-    { "id": "p7", "name": "Joueur 07", "status": "ELIMINE" },
-    { "id": "p8", "name": "Joueur 08", "status": "ELIMINE" },
-    { "id": "p9", "name": "Joueur 09", "status": "ELIMINE" },
-    { "id": "p10", "name": "Joueur 10", "status": "ELIMINE" },
-    { "id": "p11", "name": "+225 0152553426", "status": "ELIMINE" },
-    { "id": "p12", "name": "Joueur 12", "status": "ELIMINE" },
-    { "id": "p13", "name": "Joueur 13", "status": "ELIMINE" },
-    { "id": "p14", "name": "Joueur 14", "status": "ELIMINE" },
-    { "id": "p15", "name": "Joueur 15", "status": "ELIMINE" },
-    { "id": "p16", "name": "Joueur 16", "status": "ELIMINE" },
-    { "id": "p17", "name": "Joueur 17", "status": "ELIMINE" },
-    { "id": "p18", "name": "Joueur 18", "status": "ELIMINE" },
-    { "id": "p19", "name": "Joueur 19", "status": "ELIMINE" },
-    { "id": "p20", "name": "Joueur 20", "status": "ELIMINE" },
-    { "id": "p21", "name": "Joueur 21", "status": "ELIMINE" },
-    { "id": "p22", "name": "Joueur 22", "status": "ELIMINE" },
-    { "id": "p23", "name": "Joueur 23", "status": "ELIMINE" },
-    { "id": "p24", "name": "Joueur 24", "status": "ELIMINE" },
-    { "id": "p25", "name": "Joueur 25", "status": "ELIMINE" },
-    { "id": "p26", "name": "Joueur 26", "status": "ELIMINE" },
-    { "id": "p27", "name": "Joueur 27", "status": "ELIMINE" },
-    { "id": "p28", "name": "Joueur 28", "status": "ELIMINE" },
-    { "id": "p29", "name": "Joueur 29", "status": "ELIMINE" },
-    { "id": "p30", "name": "Joueur 30", "status": "ELIMINE" },
-    { "id": "p31", "name": "Joueur 31", "status": "ELIMINE" },
-    { "id": "p32", "name": "Joueur 32", "status": "ELIMINE" }
+    { "id": "p01", "name": "SOLITAIRE HACKci", "status": "ELIMINE" },
+    { "id": "p02", "name": "le proverbe africain", "status": "QUALIFIE" },
+    { "id": "p03", "name": "Charme Boy", "status": "ELIMINE" },
+    { "id": "p04", "name": "BEN BLOOM", "status": "ELIMINE" },
+    { "id": "p05", "name": "Deku", "status": "QUALIFIE" },
+    { "id": "p06", "name": "+225 0152553426", "status": "ELIMINE" },
+    { "id": "p07", "name": "+225 0170751387", "status": "ELIMINE" },
+    { "id": "p08", "name": "+225 0501154431", "status": "ELIMINE" },
+    { "id": "p09", "name": "~ Moilime 😎💗", "status": "ELIMINE" },
+    { "id": "p10", "name": "~ EL Hassan Fofana", "status": "ELIMINE" },
+    { "id": "p11", "name": "+225 0566744192", "status": "ELIMINE" },
+    { "id": "p12", "name": "+225 0161135102", "status": "ELIMINE" },
+    { "id": "p13", "name": "+225 0170892643", "status": "ELIMINE" },
+    { "id": "p14", "name": "+225 0544008930", "status": "ELIMINE" },
+    { "id": "p15", "name": "+225 0715079633", "status": "ELIMINE" },
+    { "id": "p16", "name": "+225 0594301045", "status": "ELIMINE" },
+    { "id": "p17", "name": "+226 56 47 21 02", "status": "ELIMINE" },
+    { "id": "p18", "name": "+225 0507607690", "status": "ELIMINE" },
+    { "id": "p19", "name": "~ Ålâdjî EB~13", "status": "ELIMINE" },
+    { "id": "p20", "name": "~ Mr Coulibaly 😎", "status": "ELIMINE" },
+    { "id": "p21", "name": "+225 0172189176", "status": "ELIMINE" },
+    { "id": "p22", "name": "+225 0172200813", "status": "ELIMINE" },
+    { "id": "p23", "name": "+225 0554658075", "status": "ELIMINE" },
+    { "id": "p24", "name": "+225 0789196655", "status": "ELIMINE" },
+    { "id": "p25", "name": "+229 65 87 26 50", "status": "ELIMINE" },
+    { "id": "p26", "name": "+225 0565931689", "status": "ELIMINE" },
+    { "id": "p27", "name": "+225 0151468346", "status": "ELIMINE" },
+    { "id": "p28", "name": "+225 0717910982", "status": "ELIMINE" },
+    { "id": "p29", "name": "+225 0789294004", "status": "ELIMINE" },
+    { "id": "p30", "name": "+225 0797378566", "status": "ELIMINE" },
+    { "id": "p31", "name": "+225 0797692995", "status": "ELIMINE" },
+    { "id": "p32", "name": "+237 6 72 31 05 92", "status": "ELIMINE" }
   ],
 
   "matches": [
     {
       "id": "m01",
       "round": "R32",
-      "aId": "p5",
-      "bId": "p11",
+      "aId": "p05",
+      "bId": "p06",
       "scoreA": 5,
       "scoreB": 3,
-      "winnerId": "p5",
-      "loserId": "p11",
+      "winnerId": "p05",
+      "loserId": "p06",
       "status": "TERMINE",
       "proofUrl": "https://i.ibb.co/1Y643MFr/IMG-20260206-WA0012.webp",
       "validatedBy": "SOLITAIRE HACK 🇨🇮"
@@ -63,12 +64,12 @@
     {
       "id": "m02",
       "round": "R32",
-      "aId": "p2",
-      "bId": "p1",
+      "aId": "p02",
+      "bId": "p01",
       "scoreA": 5,
       "scoreB": 2,
-      "winnerId": "p2",
-      "loserId": "p1",
+      "winnerId": "p02",
+      "loserId": "p01",
       "status": "TERMINE",
       "proofUrl": "https://kommodo.ai/i/uvQXLtrhZgwHInyubmIm",
       "validatedBy": "SOLITAIRE HACK 🇨🇮"
@@ -76,18 +77,19 @@
     {
       "id": "mF",
       "round": "F",
-      "aId": "p5",
-      "bId": "p2",
-      "status": "A_JOUER"
+      "aId": "p05",
+      "bId": "p02",
+      "status": "A_JOUER",
+      "scheduledFor": "2026-02-07"
     }
   ],
 
   "history": [
     {
-      "ts": "2026-02-06T13:00:00Z",
+      "ts": "2026-02-07T09:00:00Z",
       "type": "FINAL_READY",
       "actor": "SOLITAIRE HACK 🇨🇮",
-      "message": "Finale officielle : Deku vs le proverbe africain. Tous les autres joueurs sont éliminés."
+      "message": "Tous les joueurs ont été éliminés. Finale officielle du jour : Deku vs le proverbe africain."
     }
   ]
 }
